@@ -7,7 +7,7 @@ services:
 
   spider:
     <<: *core
-    command: ["scrapy", "runspider", "table_parser.py"]
+    command: ["scrapy", "crawl", "table_parser"]
 
   test:
     <<: *core
