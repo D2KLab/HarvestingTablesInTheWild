@@ -3,7 +3,7 @@
 Crawlinator crawls web pages and extracts tables. It's an initial prototype for knowledge extraction pipeline.
 
 * Programming language: Python 3 (3.7)
-* Data Storage: Apache Arrow
+* Data Storage: Apache Avro
 
 ## Installation
 
