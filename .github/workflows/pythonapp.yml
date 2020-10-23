@@ -1,28 +1,46 @@
 name: Python application
 
 on:
-  push
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
+  lint:
+    name: Run pylint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build container
+        run: docker-compose build lint
+      - name: Run lint container
+        run: docker-compose run lint
+
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build container
+        run: docker-compose build test
+      - name: Run test container
+        run: docker-compose run test
+
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.7
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.7
-    - name: Install crawlinator dependencies
-      run: |
-        cd crawlinator
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    - name: Lint crawlinator with pylint
-      run: |
-        python3 -m pylint -E crawlinator/*.py
-#    - name: Test crawlinator with pytest
-#      run: |
-#        pip install pytest
-#        pytest
-
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+      - name: Install crawlinator dependencies
+        run: |
+          cd crawlinator
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Lint crawlinator with pylint
+        run: |
+          python3 -m pylint -E crawlinator/*.py
