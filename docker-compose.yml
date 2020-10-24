@@ -2,12 +2,11 @@ version: "3.8"
 services:
   core: &core
     build: .
-    environment:
-      URL_FILE: "data/wikipedia_urls.csv"
 
   spider:
     <<: *core
-    command: ["scrapy", "crawl", "table_parser"]
+    environment:
+      URL_FILE: "data/wikipedia_urls.csv"
 
   test:
     <<: *core

@@ -9,3 +9,5 @@ RUN pip install pipenv pylint
 RUN pipenv install --system --ignore-pipfile
 
 COPY . .
+
+CMD ["scrapy", "crawl", "table_parser"]
