@@ -49,8 +49,7 @@ class FetchTable(scrapy.Spider):
             obj = {}
 
             # Add header row
-            header_row = table.css('table thead tr')
-            header_columns = header_row.css('th ::text')
+            header_columns = table.css('tr th ::text')
             header_values = header_columns.getall()
             for k in range(len(header_values)):
                 # clean headers
@@ -61,7 +60,7 @@ class FetchTable(scrapy.Spider):
                 obj[header_values[k]] = []
 
             # Add data rows
-            body_rows = table.css('table tbody tr')
+            body_rows = table.css('tr')
             for row in body_rows:
                 columns = row.css('td ::text')
                 column_values = columns.getall()
