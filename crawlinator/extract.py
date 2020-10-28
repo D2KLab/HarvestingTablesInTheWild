@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
 from enum import Enum
+import json
+from datetime import datetime
+
 import scrapy
 from scrapy.utils.project import get_project_settings
 from scrapy.crawler import CrawlerProcess
@@ -60,6 +63,30 @@ class FetchTable(scrapy.Spider):
             table_list.append(table_rows)
 
         print(table_list)
+def store_table(url, page_title, table):
+    """Stores a table with given metadata and content in JSON file"""
+    obj = {
+        'url': url,
+        'timestamp': datetime.now().isoformat(), # ISO 8601
+        'page_title': page_title,
+        'table': table,
+    }
+
+    # Example table:
+
+    # COUNTRY, SIZE
+    # Finland  5.5
+    # Germany  80
+    # Norway
+    # USA      506
+
+    # table = {
+    #   "Country" : ["Finland","Germany","Norway", "USA"],
+    #   "Size": ["5.5", "80", "", "506"],
+    # }
+
+    # TODO: store this as JSON file
+    print(json.dumps(obj, indent=2))
 
 
 def crawl_urls(urls: List[str]) -> List:
