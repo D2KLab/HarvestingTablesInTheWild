@@ -62,6 +62,8 @@ class FetchTable(scrapy.Spider):
         print(table_list)
 
 
-process = CrawlerProcess(get_project_settings())
-process.crawl(FetchTable, url_string="https://www.w3schools.com/html/html_tables.asp")
-process.start()
+def crawl_urls(urls: List[str]) -> List:
+    process = CrawlerProcess(get_project_settings())
+    process.crawl(FetchTable, url_string=",".join(urls))
+    process.start()
+
