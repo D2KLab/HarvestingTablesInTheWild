@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-from enum import Enum
+import logging
+from typing import List, Dict
 import json
 from datetime import datetime
 
@@ -8,17 +9,11 @@ import scrapy
 from scrapy.utils.project import get_project_settings
 from scrapy.crawler import CrawlerProcess
 
-class XPathSelector(str, Enum):
-    TABLE="//table"
-    TABLE_ROW=".//tr"
-    TABLE_HEADER_ROW=".//th"
-    TABLE_DATA_ROW=".//td"
-    TEXT="text()"
 
-
-def append_row_values(row: scrapy.selector.unified.SelectorList, path_selector: str) -> str:
-    row_list = row.xpath(path_selector).getall()
-    return ", ".join(row_list)
+def clean_whitespace(text: str) -> str:
+    text = text.replace('\t', ' ') # replace tabs with withspace
+    text = text.strip() # remove leading / trailing whitespace
+    return text
 
 
 class FetchTable(scrapy.Spider):
@@ -27,6 +22,10 @@ class FetchTable(scrapy.Spider):
     """
 
     name = "fetchTable"
+
+    custom_settings = {
+        'LOG_LEVEL': logging.ERROR,
+    }
 
     def __init__(self, url_string: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -41,29 +40,42 @@ class FetchTable(scrapy.Spider):
         for url in self.urls:
             yield scrapy.Request(url=url, callback=self.parse)
 
-    def parse(self, response):
-        table_list = []
-        print(XPathSelector.TABLE)
-        tables = response.xpath(XPathSelector.TABLE)
+    def parse(self, response, **kwargs):
+        page_title = response.css('title::text').getall()[0]
+        tables = response.css('table')
 
         for table in tables:
-            table_rows = []
+            # empty object in which we will build our parsed table
+            obj = {}
 
-            rows = table.xpath(XPathSelector.TABLE_ROW)
-            print(type(rows))
             # Add header row
-            table_rows.append(
-                append_row_values(rows, f"{XPathSelector.TABLE_HEADER_ROW}/{XPathSelector.TEXT}"))
+            header_row = table.css('table thead tr')
+            header_columns = header_row.css('th ::text')
+            header_values = header_columns.getall()
+            for k in range(len(header_values)):
+                # clean headers
+                header_values[k] = clean_whitespace(header_values[k])
+
+                # create empty lists for each header element
+                # so we can later easily .append to it
+                obj[header_values[k]] = []
 
             # Add data rows
-            for row in rows:
-                table_rows.append(
-                    append_row_values(row, f"{XPathSelector.TABLE_DATA_ROW}/{XPathSelector.TEXT}"))
+            body_rows = table.css('table tbody tr')
+            for row in body_rows:
+                columns = row.css('td ::text')
+                column_values = columns.getall()
 
-            table_list.append(table_rows)
+                # append each value of this column to the correct object element
+                for k in range(len(column_values)):
+                    obj[header_values[k]].append(
+                        clean_whitespace(column_values[k]),
+                        )
 
-        print(table_list)
-def store_table(url, page_title, table):
+            # Save table object
+            store_table(response.url, page_title, obj)
+
+def store_table(url: str, page_title: str, table: Dict[str, List[str]]):
     """Stores a table with given metadata and content in JSON file"""
     obj = {
         'url': url,
@@ -89,8 +101,12 @@ def store_table(url, page_title, table):
     print(json.dumps(obj, indent=2))
 
 
-def crawl_urls(urls: List[str]) -> List:
+def crawl_urls(urls: List[str]):
     process = CrawlerProcess(get_project_settings())
     process.crawl(FetchTable, url_string=",".join(urls))
     process.start()
 
+def craw_cc_urls(urls: List[str]):
+    # TODO: implement crawling pages from CommonCrawls dataset
+    # https://commoncrawl.org/the-data/get-started/
+    pass
