@@ -7,7 +7,11 @@ from extract import crawl_urls
 
 def main():
     parser = argparse.ArgumentParser(prog='crawlinator.py',
-                                     description='Fetches and extracts table from HTML pages')
+                                     formatter_class=argparse.RawTextHelpFormatter,
+                                     description="""Fetches and extracts table from HTML pages. Example URLs:
+                                     https://www.ecdc.europa.eu/en/cases-2019-ncov-eueea
+                                     https://www.w3schools.com/html/html_tables.asp
+                                     """)
     parser.add_argument('url', nargs='*', action='append')
     args = parser.parse_args()
     if len(args.url[0]) == 0:
