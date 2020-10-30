@@ -1,0 +1,19 @@
+version: "3.8"
+services:
+  core: &core
+    build: .
+
+  spider:
+    <<: *core
+    environment:
+      URL_FILE: "data/wikipedia_urls.csv"
+
+  test:
+    <<: *core
+    command: ["python", "-m", "unittest", "discover", "./test"]
+
+  lint:
+    <<: *core
+    environment:
+      REQUIRED_QUALITY: 9
+    command: ["pipenv", "run", "lint"]
