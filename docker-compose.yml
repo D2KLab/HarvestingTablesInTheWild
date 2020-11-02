@@ -6,7 +6,7 @@ services:
   spider:
     <<: *core
     environment:
-      URL_FILE: "data/wikipedia_urls.csv"
+      URL_FILE: "data/test-urls.txt"
 
   test:
     <<: *core
