@@ -17,21 +17,19 @@ class TableParserSpider(scrapy.Spider):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        urls = os.environ.get('URL_STRING')
-        if urls:
-            self.urls = urls.split(',')
-        else:
-            url_file = os.environ.get('URL_FILE')
+        url_string = os.environ.get('URL_STRING')
+        url_file = os.environ.get('URL_FILE')
+
+        if url_string:
+            self.urls = url_string.split(',')
+        elif url_file:
             with open(url_file, 'r') as fd:
-                reader = csv.reader(fd)
                 self.urls = []
-                for row in reader:
+                for row in csv.reader(fd):
                     self.urls.append(row[0])
 
         if not self.urls:
             raise Exception('Error: Need to either specify URL_STRING or URL_FILE')
-
-        self.type=type
 
     def start_requests(self):
         for url in self.urls:
