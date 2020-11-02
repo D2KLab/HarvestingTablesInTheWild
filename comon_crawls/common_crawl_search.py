@@ -1,6 +1,6 @@
 import cdx_toolkit
-from warcio.archiveiterator import ArchiveIterator
 import requests
+from warcio.archiveiterator import ArchiveIterator
 
 class CommonCrawlPageFetch:
     common_crawl_base_url = "https://commoncrawl.s3.amazonaws.com/"       
