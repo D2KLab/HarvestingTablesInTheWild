@@ -22,11 +22,10 @@ class CommonCrawlSearch:
         cdx = cdx_toolkit.CDXFetcher(source='cc')
         common_crawl_page_fetch_service = CommonCrawlPageFetch()
 
-        #POC for only one request at a time
         for search_result in cdx.iter(url, limit=1):
-
-            if search_result.data['status'] == '200':
-                common_crawl_page_fetch_service.fetch_records(search_result.data['filename'])
+            search_result_data = search_result.data
+            if search_result_data['status'] == '200':
+                common_crawl_page_fetch_service.fetch_records(search_result_data['filename'])
 
 
 CommonCrawlSearch("en.wikipedia.org/wiki/Finland")

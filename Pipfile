@@ -11,6 +11,7 @@ pylint = "*"
 scrapy = "*"
 numpy = "*"
 warcio = "*"
+cdx_toolkit = "*"
 
 [requires]
 python_version = "3.8"
