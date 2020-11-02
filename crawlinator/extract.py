@@ -6,7 +6,6 @@ import json
 from datetime import datetime
 
 import scrapy
-from scrapy.utils.project import get_project_settings
 from scrapy.crawler import CrawlerProcess
 
 
@@ -43,33 +42,34 @@ class FetchTable(scrapy.Spider):
     def parse(self, response, **kwargs):
         page_title = response.css('title::text').getall()[0]
         tables = response.css('table')
-
         for table in tables:
+            try:
             # empty object in which we will build our parsed table
-            obj = {}
+                obj = {}
 
-            # Add header row
-            header_columns = table.css('tr th ::text')
-            header_values = header_columns.getall()
-            for k in range(len(header_values)):
-                # clean headers
-                header_values[k] = clean_whitespace(header_values[k])
+                # Add header row
+                header_columns = table.css('tr th ::text')
+                header_values = header_columns.getall()
+                for k in range(len(header_values)):
+                    # clean headers
+                    header_values[k] = clean_whitespace(header_values[k])
 
-                # create empty lists for each header element
-                # so we can later easily .append to it
-                obj[header_values[k]] = []
+                    # create empty lists for each header element
+                    # so we can later easily .append to it
+                    obj[header_values[k]] = []
 
-            # Add data rows
-            body_rows = table.css('tr')
-            for row in body_rows:
-                columns = row.css('td ::text')
-                column_values = columns.getall()
-
-                # append each value of this column to the correct object element
-                for k in range(len(column_values)):
-                    obj[header_values[k]].append(
-                        clean_whitespace(column_values[k]),
-                        )
+                # Add data rows
+                body_rows = table.css('tr')
+                for row in body_rows:
+                    columns = row.css('td ::text')
+                    column_values = [x for x in columns.getall() if x == '' or clean_whitespace(x) != '']
+                    # append each value of this column to the correct object element
+                    for k, _ in enumerate(column_values):
+                        obj[header_values[k]].append(
+                            clean_whitespace(column_values[k]),
+                            )
+            except Exception as e:
+                   print(e)
 
             # Save table object
             store_table(response.url, page_title, obj)
@@ -101,7 +101,7 @@ def store_table(url: str, page_title: str, table: Dict[str, List[str]]):
 
 
 def crawl_urls(urls: List[str]):
-    process = CrawlerProcess(get_project_settings())
+    process = CrawlerProcess()
     process.crawl(FetchTable, url_string=",".join(urls))
     process.start()
 
