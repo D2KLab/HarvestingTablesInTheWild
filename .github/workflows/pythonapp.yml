@@ -1,46 +1,20 @@
 name: Python application
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
+  push
 
 jobs:
   lint:
-    name: Run pylint
+    name: Lint & Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Build container
-        run: docker-compose build lint
-      - name: Run lint container
+      - name: Build core container
+        run: docker-compose build core
+      - name: Run linting
         run: docker-compose run lint
-
-  test:
-    name: Run tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Build container
-        run: docker-compose build test
-      - name: Run test container
-        run: docker-compose run test
-
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.7
-        uses: actions/setup-python@v1
-        with:
-          python-version: 3.7
-      - name: Install crawlinator dependencies
-        run: |
-          cd crawlinator
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      - name: Lint crawlinator with pylint
-        run: |
-          python3 -m pylint -E crawlinator/*.py
+      # Disable for now, since we don't have any unit tests yet
+      # - name: Run unit tests
+      #   run: docker-compose run test
+      - name: Run integration test
+        run: docker-compose run spider

@@ -2,13 +2,20 @@
 
 ## Requirements
 
+- Python 3.8
 - `pipenv`
 - `docker-compose`
 
 ## Installation
 
+For installing runtime dependencies:
 ```bash
 pipenv install
+```
+
+For also installing development dependencies (linting & testing):
+```
+pipenv install --dev
 ```
 
 ## Lint and testing
@@ -32,5 +39,7 @@ docker-compose up --build test
 ```bash
 docker-compose up --build spider
 # or
-URL_FILE=<your file containing urls> scrapy runspider table_parser.py
+scrapy crawl table_parser
 ```
+
+URLs can either be specified as a string in environment variable `URL_STRING` (e.g. `URL_STRING=http://a.example.com,http://b.example.com`) or loaded from a file specified by `URL_FILE` with one URL per line.
