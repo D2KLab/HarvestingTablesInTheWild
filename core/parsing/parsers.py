@@ -49,6 +49,7 @@ class WikitableParser(TableParser):
         rows_after_headers = all_rows[header_index+1:]
         rows_with_cleaned_cells = [map(utils.parse_inner_text_from_html, row.css(
             'td').extract()) for row in rows_after_headers if row != '']
+
         if len(rows_with_cleaned_cells) < 2 or len(header_values) < 2:
             raise InvalidTableException()
 
