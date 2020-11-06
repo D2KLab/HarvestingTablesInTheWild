@@ -16,7 +16,10 @@ def parse_inner_text_from_html(html: str) -> str:
     bs = BeautifulSoup(html)
     return clean_whitespace(bs.text)
 
-
+def get_title_from_text(html: str) -> str:
+    bs = BeautifulSoup(html, 'html.parser')
+    return bs.title.string
+    
 def compose_normalized_table(headers: Iterable, rows: Iterable) -> Dict:
     '''
     Parameters:
