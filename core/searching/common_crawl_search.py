@@ -43,4 +43,4 @@ class CommonCrawlSearch:
         if url is not None:
             self.generate_table(url, raw_html)
         else:
-            print("No URL was found for this ")
+            print("No URL was found for the provided URL")

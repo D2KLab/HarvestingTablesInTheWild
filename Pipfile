@@ -10,7 +10,6 @@ pylint = "*"
 [packages]
 scrapy = "*"
 numpy = "*"
-warcio = "*"
 cdx_toolkit = "*"
 beautifulsoup4 = "*"
 
