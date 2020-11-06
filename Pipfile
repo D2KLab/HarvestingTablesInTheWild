@@ -12,6 +12,7 @@ scrapy = "*"
 numpy = "*"
 warcio = "*"
 cdx_toolkit = "*"
+beautifulsoup4 = "*"
 
 [requires]
 python_version = "3.8"
