@@ -1,6 +1,3 @@
-import sys
-sys.path.append("/home/rohit/Documents/HarvestingTablesInTheWild")
-
 from typing import Dict
 from datetime import datetime
 from abc import ABC, abstractmethod

@@ -1,9 +1,9 @@
+# TODO remove this when testing is completed
+# import sys
+#sys.path.append("/home/rohit/Documents/HarvestingTablesInTheWild")
+
 import cdx_toolkit
 from scrapy.selector import Selector
-
-import sys
-sys.path.append("/home/rohit/Documents/HarvestingTablesInTheWild")
-
 from core.parsing.utils import get_parser_from_url, get_title_from_text
 
 
@@ -34,7 +34,7 @@ class CommonCrawlSearch:
         return None, ""
 
     def generate_table(self, url, html):
-        parser= get_parser_from_url(url)
+        parser = get_parser_from_url(url)
         page_title = get_title_from_text(html)
         CommonCrawlTable.parse_table_from_raw_Html(html, page_title, url, parser)
 
@@ -44,11 +44,3 @@ class CommonCrawlSearch:
             self.generate_table(url, raw_html)
         else:
             print("No URL was found for this ")
-
-#CommonCrawlSearch("https://en.wikipedia.org/wiki/Chhapra")
-
-
-with open ("/home/rohit/Desktop/a.html", "r") as myfile:
-    data=myfile.read()
-
-parse_table_from_Html(data, "https://en.wikipedia.org/wiki/Chhapra")
