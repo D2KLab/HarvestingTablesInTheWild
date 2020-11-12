@@ -1,10 +1,12 @@
 from functools import reduce
-from typing import Iterable, Dict
+from typing import Iterable, Dict, List
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 from core.parsing.parsers import TableParser, WikitableParser, WellFormattedTableParser
 from core.parsing.exceptions import InvalidTableException
 
+
+MIN_BODY_ROWS = 2
 
 def clean_whitespace(text: str) -> str:
     text = text.replace('\t', ' ')  # replace tabs with withspace
@@ -15,6 +17,27 @@ def clean_whitespace(text: str) -> str:
 def parse_inner_text_from_html(html: str) -> str:
     bs = BeautifulSoup(html)
     return clean_whitespace(bs.text)
+
+def check_body_cell_layout(rows: Iterable[List]) -> bool:
+    """
+    Checks that the layout of the table body is regular, i.e.
+    that there is no row with more columns than the most
+    common number of columns
+    Raises InvalidTableException when a requirements is not satisfied
+    """
+    if len(rows) < MIN_BODY_ROWS:
+        raise InvalidTableException(f'Table only has {len(rows)} rows, min: {MIN_BODY_ROWS}')
+
+    rowCols = {}
+    for row in rows:
+        rowCols[len(row)] = rowCols.get(len(row), 0) + 1
+
+    mostCommonCols = max(rowCols, key=rowCols.get)
+    maxCols = max(rowCols)
+    if maxCols > mostCommonCols:
+        raise InvalidTableException('Maximum number of columns exceed most common number of columns')
+
+    return True
 
 
 def compose_normalized_table(headers: Iterable, rows: Iterable) -> Dict:
