@@ -109,7 +109,7 @@ class WellFormattedTableParser(TableParser):
             for row in table.css('tr')
         ]
 
-        # check if body is regular
-        utils.check_body_cell_layout(body_rows)
+        # basic sanity check for body, will raise on error
+        utils.validate_body_cell_layout(body_rows)
 
         return utils.compose_normalized_table(header_values, body_rows)

@@ -18,7 +18,7 @@ def parse_inner_text_from_html(html: str) -> str:
     bs = BeautifulSoup(html)
     return clean_whitespace(bs.text)
 
-def check_body_cell_layout(rows: Iterable[List]) -> bool:
+def validate_body_cell_layout(rows: Iterable[List]):  # pylint: disable=useless-return
     """
     Checks that the layout of the table body is regular, i.e.
     that there is no row with more columns than the most
@@ -28,16 +28,16 @@ def check_body_cell_layout(rows: Iterable[List]) -> bool:
     if len(rows) < MIN_BODY_ROWS:
         raise InvalidTableException(f'Table only has {len(rows)} rows, min: {MIN_BODY_ROWS}')
 
-    rowCols = {}
+    row_cols = {}
     for row in rows:
-        rowCols[len(row)] = rowCols.get(len(row), 0) + 1
+        row_cols[len(row)] = row_cols.get(len(row), 0) + 1
 
-    mostCommonCols = max(rowCols, key=rowCols.get)
-    maxCols = max(rowCols)
-    if maxCols > mostCommonCols:
+    most_common_cols = max(row_cols, key=row_cols.get)
+    max_cols = max(row_cols)
+    if max_cols > most_common_cols:
         raise InvalidTableException('Maximum number of columns exceed most common number of columns')
 
-    return True
+    return None
 
 
 def compose_normalized_table(headers: Iterable, rows: Iterable) -> Dict:
