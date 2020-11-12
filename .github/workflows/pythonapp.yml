@@ -13,8 +13,7 @@ jobs:
         run: docker-compose build core
       - name: Run linting
         run: docker-compose run lint
-      # Disable for now, since we don't have any unit tests yet
-      # - name: Run unit tests
-      #   run: docker-compose run test
+      - name: Run unit tests
+        run: docker-compose run test
       - name: Run integration test
         run: docker-compose run spider
