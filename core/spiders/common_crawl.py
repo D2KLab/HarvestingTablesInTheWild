@@ -45,8 +45,3 @@ class CommonCrawlTableParserSpider(scrapy.Spider):
             # pylint: disable=broad-except
             except Exception as e:
                 self.logger.error("Failed to parse table", e)
-
-
-
-
-    

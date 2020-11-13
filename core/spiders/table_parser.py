@@ -26,7 +26,7 @@ class TableParserSpider(scrapy.Spider):
     def parse(self, response, **kwargs):
         page_title = get_title_from_text(response)
         parser = get_parser_from_url(response.url)
-        
+
         for table in parser.get_tables(response):
             try:
                 yield parser.parse_table(table, url=response.url, page_title=page_title)

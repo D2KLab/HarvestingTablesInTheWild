@@ -12,7 +12,7 @@ BOT_NAME = 'core'
 SPIDER_MODULES = ['core.spiders']
 NEWSPIDER_MODULE = 'core.spiders'
 
-LOG_LEVEL = 'INFO'
+LOG_LEVEL = 'ERROR'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'core (+http://www.yourdomain.com)'
