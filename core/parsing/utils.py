@@ -1,3 +1,5 @@
+import os
+import csv
 from functools import reduce
 from typing import Iterable, Dict
 from urllib.parse import urlparse
@@ -16,9 +18,8 @@ def parse_inner_text_from_html(html: str) -> str:
     bs = BeautifulSoup(html)
     return clean_whitespace(bs.text)
 
-def get_title_from_text(html: str) -> str:
-    bs = BeautifulSoup(html, 'html.parser')
-    return bs.title.string
+def get_title_from_text(response) -> str:
+    return response.css('title::text').getall()[0]
     
 def compose_normalized_table(headers: Iterable, rows: Iterable) -> Dict:
     '''
@@ -44,6 +45,21 @@ def compose_normalized_table(headers: Iterable, rows: Iterable) -> Dict:
     except IndexError as e:
         raise InvalidTableException() from e
 
+def get_url_list_from_environment():
+    url_string = os.environ.get('URL_STRING')
+    url_file = os.environ.get('URL_FILE')
+
+    if url_string:
+        return url_string.split(',')
+    
+    if url_file:
+        with open(url_file, 'r') as fd:
+            urls = []
+            for row in csv.reader(fd):
+                urls.append(row[0])
+        return urls
+    
+    return None
 
 def get_parser_from_url(url: str) -> TableParser:
     o = urlparse(url)

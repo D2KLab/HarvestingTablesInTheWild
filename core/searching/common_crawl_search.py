@@ -1,13 +1,8 @@
-# TODO remove this when testing is completed
-# import sys
-#sys.path.append("/home/rohit/Documents/HarvestingTablesInTheWild")
-
 import cdx_toolkit
 from scrapy.selector import Selector
-from core.parsing.utils import get_parser_from_url, get_title_from_text
 
-
-class CommonCrawlTable:
+#remove if not required
+class CommonCrawlTableParser:
     @staticmethod
     def parse_table_from_raw_Html(html, page_title, url, parser):
         scrapy_response = Selector(text=html)
@@ -20,27 +15,18 @@ class CommonCrawlTable:
 
 
 class CommonCrawlSearch:
-    def __init__(self, limit=1, index_start_month="202008", index_end_month="202009"):
+    def __init__(self, limit=1, index_start_month="202005", index_end_month="202006"):
         self.limit = limit
         self.start_month = index_start_month
         self.end_month = index_end_month
         self.cdx = cdx_toolkit.CDXFetcher(source='cc')
 
-    def search_common_crawl(self, cc_url=""):        
+    def __search_common_crawl(self, cc_url=""):        
         for search_result in self.cdx.iter(cc_url, limit=self.limit, from_ts=self.start_month, to=self.end_month):
                 search_result_data = search_result.data
                 if search_result_data['status'] == '200':
-                    return search_result_data['url'], search_result.content
+                    return search_result_data['filename'], search_result.content
         return None, ""
 
-    def generate_table(self, url, html):
-        parser = get_parser_from_url(url)
-        page_title = get_title_from_text(html)
-        CommonCrawlTable.parse_table_from_raw_Html(html, page_title, url, parser)
-
-    def get_tables_from_common_crawl(self):
-        url, raw_html = self.search_common_crawl()
-        if url is not None:
-            self.generate_table(url, raw_html)
-        else:
-            print("No URL was found for the provided URL")
+    def get_html_from_common_crawl(self, url):
+        return self.__search_common_crawl(url)
