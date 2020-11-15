@@ -5,9 +5,14 @@
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
+from scrapy.exceptions import IgnoreRequest
+from scrapy.http import HtmlResponse
+
+from core.searching.common_crawl_search import CommonCrawlSearch
+from core.spiders.common_crawl import CommonCrawlTableParserSpider
+
 
 # useful for handling different item types with a single interface
-from itemadapter import is_item, ItemAdapter
 
 
 class CoreSpiderMiddleware:
@@ -79,7 +84,23 @@ class CoreDownloaderMiddleware:
         # - or return a Request object
         # - or raise IgnoreRequest: process_exception() methods of
         #   installed downloader middleware will be called
+        if isinstance(spider, CommonCrawlTableParserSpider):
+            # Check that request is given explicitly
+            if request.meta.get('explicit'):
+                return CoreDownloaderMiddleware.__get_common_crawl_response(request.url)
+            else:
+                raise IgnoreRequest()
+
         return None
+
+    @staticmethod
+    def __get_common_crawl_response(url):
+        common_crawl = CommonCrawlSearch()
+        filename, html = common_crawl.get_html_from_common_crawl(url)
+        if filename is None:
+            raise IgnoreRequest("No capture was found for this url")
+        else:
+            return HtmlResponse(url, body=html)
 
     def process_response(self, request, response, spider):
         # Called with the response returned from the downloader.
