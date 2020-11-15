@@ -7,17 +7,8 @@ class CommonCrawlTableParserSpider(scrapy.Spider):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.urls = get_url_list_from_environment()
 
-        urls = get_url_list_from_environment()
-
-        if urls is None:
-            raise Exception(
-                'Need to either specify URL_STRING or URL_FILE')
-        
-        self.urls = urls
-
-        if not self.urls:
-            raise Exception('No URLs found from provided resource')
 
         self.common_crawl = CommonCrawlSearch()
         self.logger.info("Initialized common crawl object")

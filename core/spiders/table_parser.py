@@ -1,4 +1,5 @@
 import scrapy
+
 from core.parsing.utils import get_parser_from_url, get_url_list_from_environment, get_title_from_text
 
 
@@ -7,17 +8,7 @@ class TableParserSpider(scrapy.Spider):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        urls = get_url_list_from_environment()
-
-        if urls is None:
-            raise Exception(
-                'Need to either specify URL_STRING or URL_FILE')
-        
-        self.urls = urls
-
-        if not self.urls:
-            raise Exception('No URLs found from provided resource')
+        self.urls = get_url_list_from_environment()
 
     def start_requests(self):
         for url in self.urls:
