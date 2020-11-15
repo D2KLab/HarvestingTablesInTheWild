@@ -1,17 +1,20 @@
-from typing import Dict
-from datetime import datetime
 from abc import ABC, abstractmethod
-from core.parsing import utils
+from datetime import datetime
+from typing import Dict
+
 from core.items import CoreTableItem
+# pylint: disable=cyclic-import
+from core.parsing import utils
 from core.parsing.exceptions import InvalidTableException
 
 
 class TableParser(ABC):
-    '''
+    """
     Abstract base class that should be defined for different types of tables that require parsing.
 
     See core.parsing.utils.get_parser_from_url
-    '''
+    """
+
     @classmethod
     @abstractmethod
     def normalize_table(cls, table) -> Dict:
@@ -46,7 +49,7 @@ class WikitableParser(TableParser):
 
         header_values = list(
             map(utils.parse_inner_text_from_html, header_values))
-        rows_after_headers = all_rows[header_index+1:]
+        rows_after_headers = all_rows[header_index + 1:]
         rows_with_cleaned_cells = [map(utils.parse_inner_text_from_html, row.css(
             'td').extract()) for row in rows_after_headers if row != '']
 
