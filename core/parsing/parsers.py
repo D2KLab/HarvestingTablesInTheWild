@@ -23,7 +23,17 @@ class TableParser(ABC):
 
     @classmethod
     def get_tables(cls, response):
-        return response.css('table')
+        tables = response.css('table')
+        for t in tables:
+            # remove tables inside forms
+            # how TODO with scrapy selectors?
+
+            # skip over tables with subtables
+            if t.css('table table'):
+                continue
+
+            yield t
+
 
     @classmethod
     def parse_table(cls, table, **meta) -> CoreTableItem:
@@ -79,12 +89,30 @@ class WikitableParser(TableParser):
 class WellFormattedTableParser(TableParser):
     @classmethod
     def normalize_table(cls, table):
+	# eliminate tables with "rowspan" or "colspan"
+        if table.css('td[colspan]').getall() \
+           or table.css('th[colspan]').getall() \
+           or table.css('td[rowspan]').getall() \
+           or table.css('td[rowspan]').getall():
+            raise InvalidTableException('Tables with colspan / rowspan not supported')
+
+        # extract header
         header_columns = table.css('tr th')
         header_values = list(
             map(utils.parse_inner_text_from_html, header_columns.getall()))
+        if not header_values:
+            # tables without headers are almost useless for automated processing,
+            # just drop them here
+            raise InvalidTableException('No headers found in table')
+
+        # extract body
         body_rows = [
             [utils.parse_inner_text_from_html(x)
              for x in row.css('td').getall()]
             for row in table.css('tr')
         ]
+
+        # basic sanity check for body, will raise on error
+        utils.validate_body_cell_layout(body_rows)
+
         return utils.compose_normalized_table(header_values, body_rows)

@@ -5,8 +5,8 @@ WORKDIR /srv/app
 COPY Pipfile Pipfile.lock ./
 
 RUN python -m pip install --upgrade pip
-RUN pip install pipenv pylint
-RUN pipenv install --system --ignore-pipfile
+RUN pip install pipenv
+RUN pipenv install --system --ignore-pipfile --dev
 
 COPY . .
 

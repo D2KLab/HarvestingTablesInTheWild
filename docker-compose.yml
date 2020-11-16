@@ -10,7 +10,7 @@ services:
 
   test:
     <<: *core
-    command: ["python", "-m", "unittest", "discover", "./test"]
+    command: ["python", "-m", "pytest"]
 
   lint:
     <<: *core
