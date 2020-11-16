@@ -14,6 +14,8 @@ MIN_BODY_ROWS = 2
 
 def clean_whitespace(text: str) -> str:
     text = text.replace('\t', ' ')  # replace tabs with withspace
+    text = text.replace('\r', ' ')  # replace end-of-line with withspace
+    text = text.replace('\n', ' ')  # replace newlines with withspace
     text = text.strip()  # remove leading / trailing whitespace
     return text
 
@@ -21,6 +23,16 @@ def clean_whitespace(text: str) -> str:
 def parse_inner_text_from_html(html: str) -> str:
     bs = BeautifulSoup(html)
     return clean_whitespace(bs.text)
+
+def get_term_set(html: str) -> List[str]:
+    """
+    Returns the 100 most common terms (words) on the web page,
+    sorted in descending order
+    """
+    _ = html.css('body *::text').getall()
+    # TODO
+
+    return [""]
 
 def validate_body_cell_layout(rows: Iterable[List]):  # pylint: disable=useless-return
     """
