@@ -3,8 +3,11 @@ import scrapy
 from core.parsing.utils import get_parser_from_url, get_url_list_from_environment, get_title_from_text
 
 
-class TableParserSpider(scrapy.Spider):
-    name = 'table_parser'
+class CommonCrawlTableParserSpider(scrapy.Spider):
+    name = "common_crawl_table_parser"
+    custom_settings = {
+        'ROBOTSTXT_OBEY': False
+    }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -12,11 +15,11 @@ class TableParserSpider(scrapy.Spider):
 
     def start_requests(self):
         for url in self.urls:
-            yield scrapy.Request(url=url, callback=self.parse)
+            yield scrapy.Request(url, callback=self.parse, meta={'explicit': True})
 
     def parse(self, response, **kwargs):
-        page_title = get_title_from_text(response)
         parser = get_parser_from_url(response.url)
+        page_title = get_title_from_text(response)
 
         for table in parser.get_tables(response):
             try:

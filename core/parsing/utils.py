@@ -1,9 +1,13 @@
+import csv
+import os
 from functools import reduce
 from typing import Iterable, Dict, List
 from urllib.parse import urlparse
+
 from bs4 import BeautifulSoup
-from core.parsing.parsers import TableParser, WikitableParser, WellFormattedTableParser
+
 from core.parsing.exceptions import InvalidTableException
+from core.parsing.parsers import TableParser, WikitableParser, WellFormattedTableParser
 
 
 MIN_BODY_ROWS = 2
@@ -40,6 +44,10 @@ def validate_body_cell_layout(rows: Iterable[List]):  # pylint: disable=useless-
     return None
 
 
+def get_title_from_text(response) -> str:
+    return response.css('title::text').getall()[0]
+
+
 def compose_normalized_table(headers: Iterable, rows: Iterable) -> Dict:
     '''
     Parameters:
@@ -63,6 +71,25 @@ def compose_normalized_table(headers: Iterable, rows: Iterable) -> Dict:
         return normalized_table
     except IndexError as e:
         raise InvalidTableException() from e
+
+
+def get_url_list_from_environment():
+    url_string = os.environ.get('URL_STRING')
+    url_file = os.environ.get('URL_FILE')
+
+    if url_string:
+        urls = url_string.split(',')
+    elif url_file:
+        with open(url_file, 'r') as fd:
+            urls = []
+            for row in csv.reader(fd):
+                urls.append(row[0])
+    else:
+        raise Exception(
+            'Need to either specify URL_STRING or URL_FILE')
+    if len(urls) == 0:
+        raise Exception('No URLs found from provided resource')
+    return urls
 
 
 def get_parser_from_url(url: str) -> TableParser:

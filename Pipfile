@@ -11,6 +11,7 @@ pytest = "*"
 [packages]
 scrapy = "*"
 numpy = "*"
+cdx_toolkit = "*"
 beautifulsoup4 = "*"
 
 [requires]
