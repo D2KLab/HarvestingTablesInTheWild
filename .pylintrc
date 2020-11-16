@@ -56,7 +56,6 @@ enable=use-symbolic-message-instead,useless-supression,fixme
 disable=
     attribute-defined-outside-init,
     duplicate-code,
-    invalid-name,
     missing-docstring,
     protected-access,
     too-few-public-methods,
@@ -173,7 +172,7 @@ expected-line-ending-format=
 bad-functions=map,filter,input
 
 # Good variable names which should always be accepted, separated by a comma
-good-names=i,j,k,ex,Run,_
+good-names=e,i,j,k,o,t,ex,Run,_
 
 # Bad variable names which should always be refused, separated by a comma
 bad-names=foo,bar,baz,toto,tutu,tata
@@ -186,13 +185,13 @@ name-group=
 include-naming-hint=no
 
 # Regular expression matching correct function names
-function-rgx=[a-z_][a-z0-9_]{2,30}$
+function-rgx=[a-z0-9_][a-z0-9_]{2,30}$
 
 # Naming hint for function names
 function-name-hint=[a-z_][a-z0-9_]{2,30}$
 
 # Regular expression matching correct variable names
-variable-rgx=[a-z_][a-z0-9_]{2,30}$
+variable-rgx=[a-z0-9_]{2,30}$
 
 # Naming hint for variable names
 variable-name-hint=[a-z_][a-z0-9_]{2,30}$
