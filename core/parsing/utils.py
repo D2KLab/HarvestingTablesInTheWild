@@ -2,8 +2,10 @@ import csv
 import os
 from functools import reduce
 from typing import Iterable, Dict, List
+import itertools
 
 from bs4 import BeautifulSoup
+from scrapy.http.response.html import HtmlResponse
 
 from core.parsing.exceptions import InvalidTableException
 
@@ -17,20 +19,37 @@ def clean_whitespace(text: str) -> str:
     text = text.strip()  # remove leading / trailing whitespace
     return text
 
-
 def parse_inner_text_from_html(html: str) -> str:
     bs = BeautifulSoup(html)
     return clean_whitespace(bs.text)
 
-def get_term_set(html: str) -> List[str]:
+def get_term_set(html) -> List[str]:
     """
     Returns the 100 most common terms (words) on the web page,
     sorted in descending order
     """
-    _ = html.css('body *::text').getall()
-    # TODO
+    if isinstance(html, str):
+        fields = html.split() # split into fields
+    elif isinstance(html, HtmlResponse):
+        fields = html.css('body *::text').getall()
+    else:
+        raise TypeError('Type must by scrapy.HtmlResponse or str, got:  ' + type(html))
 
-    return [""]
+    # convert and reduce all whitespace characters
+    cleaned_fields = map(clean_whitespace, fields)
+    # split at word boundaries and flatten list
+    split_fields =  list(itertools.chain(*[f.split() for f in cleaned_fields]))
+    # cast all non-empty and non-whitespace fields to lowercase
+    non_empty_fields = [f.lower() for f in split_fields if f and not f.isspace()]
+    # accumulate to calculate frequencies
+    term_freq = {}
+    for f in non_empty_fields:
+        term_freq[f] = term_freq.get(f, 0) + 1
+
+    sorted_terms = [term for term, freq in sorted(term_freq.items(), key=lambda item: item[1], reverse=True)]
+
+    # return at most 100 items
+    return sorted_terms[0:100]
 
 def validate_body_cell_layout(rows: Iterable[List]):  # pylint: disable=useless-return
     """
