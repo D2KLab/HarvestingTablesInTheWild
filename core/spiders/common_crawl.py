@@ -2,7 +2,8 @@ from datetime import datetime
 
 import scrapy
 
-from core.parsing.utils import get_parser_from_url, get_url_list_from_environment, get_title_from_text, get_term_set
+from core.parsing.utils import get_url_list_from_environment, get_title_from_text, get_term_set
+from core.parsing.parsers import get_parser_from_url
 from core.items import CoreDataItem
 
 
@@ -40,17 +41,17 @@ class CommonCrawlTableParserSpider(scrapy.Spider):
                 headers=core_table.headers,
                 hasHeader=bool(core_table.headers),
                 headerPosition=core_table.header_position,
-                tableNum = table_number,
-                tableType = core_table.table_type,
-                termSet = term_set,
-                title = core_table.title,
-                pageTitle = page_title,
+                tableNum=table_number,
+                tableType=core_table.table_type,
+                termSet=term_set,
+                title=core_table.title,
+                pageTitle=page_title,
                 url=response.url,
-                timestamp = timestamp,
-                markup = table.get(),
-                textBeforeTable = "", # TODO
-                textAfterTable = "", # TODO
-                s3Link = "", # TODO
+                timestamp=timestamp,
+                markup=table.get(),
+                textBeforeTable="", # TODO
+                textAfterTable="", # TODO
+                s3Link="", # TODO
                 recordOffset=0, # TODO
                 recordEndOffset=0, # TODO
             )

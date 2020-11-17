@@ -2,12 +2,10 @@ import csv
 import os
 from functools import reduce
 from typing import Iterable, Dict, List
-from urllib.parse import urlparse
 
 from bs4 import BeautifulSoup
 
 from core.parsing.exceptions import InvalidTableException
-from core.parsing.parsers import TableParser, WikitableParser, WellFormattedTableParser
 
 
 MIN_BODY_ROWS = 2
@@ -102,10 +100,3 @@ def get_url_list_from_environment():
     if len(urls) == 0:
         raise Exception('No URLs found from provided resource')
     return urls
-
-
-def get_parser_from_url(url: str) -> TableParser:
-    o = urlparse(url)
-    if "wikipedia.org" in o.netloc:
-        return WikitableParser()
-    return WellFormattedTableParser()

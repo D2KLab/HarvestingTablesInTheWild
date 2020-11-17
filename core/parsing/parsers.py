@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Dict, List
+from urllib.parse import urlparse
 
 from core.parsing import utils
 from core.items import CoreTableItem
@@ -10,7 +11,7 @@ class TableParser(ABC):
     """
     Abstract base class that should be defined for different types of tables that require parsing.
 
-    See core.parsing.utils.get_parser_from_url
+    See get_parser_from_url()
     """
 
     @classmethod
@@ -151,3 +152,10 @@ class WellFormattedTableParser(TableParser):
         except InvalidTableException:
             # TODO: keep track of how often this happens
             pass
+
+
+def get_parser_from_url(url: str) -> TableParser:
+    o = urlparse(url)
+    if "wikipedia.org" in o.netloc:
+        return WikitableParser()
+    return WellFormattedTableParser()

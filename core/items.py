@@ -20,7 +20,7 @@ class CoreTableItem:
     headers: List[str]
 
 @dataclass
-class CoreDataItem:
+class CoreDataItem: # pylint: disable=too-many-instance-attributes
     """
     External data format which will be used for exporting
     Contains all information and metadata about the table and webpage
