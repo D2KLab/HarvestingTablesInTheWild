@@ -13,10 +13,8 @@ from core.parsing.exceptions import InvalidTableException
 MIN_BODY_ROWS = 2
 
 def clean_whitespace(text: str) -> str:
-    text = text.replace('\t', ' ')  # replace tabs with withspace
-    text = text.replace('\r', ' ')  # replace end-of-line with withspace
-    text = text.replace('\n', ' ')  # replace newlines with withspace
-    text = text.strip()  # remove leading / trailing whitespace
+    # remove tabs, newlines and other whitespace (also leading/trailing)
+    text = ' '.join(text.split())
     return text
 
 def parse_inner_text_from_html(html: str) -> str:

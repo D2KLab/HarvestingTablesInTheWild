@@ -34,7 +34,8 @@ class CommonCrawlTableParserSpider(scrapy.Spider):
                 core_table = parser.parse_table(table)
             # pylint: disable=broad-except
             except Exception as e:
-                self.logger.error("Failed to parse table", e)
+                self.logger.error("Failed to parse table on %s: %s", response.url, e)
+                continue
 
             yield CoreDataItem(
                 relation=core_table.table,

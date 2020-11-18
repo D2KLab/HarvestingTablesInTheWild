@@ -50,21 +50,21 @@ class WikitableParser(TableParser):
     @classmethod
     def normalize_table(cls, table):
         all_rows = table.css('tr')
-        header_values, header_index = cls.__find_header_row(all_rows)
+        headers_per_row = map(lambda x: x.css('th').getall(), all_rows)
+        header_values, header_index = cls.__find_header_row(headers_per_row)
         if header_index != 0:
             raise InvalidTableException('Only header in first row supported')
 
         header_values = list(
             map(utils.parse_inner_text_from_html, header_values))
+        rows_after_headers = all_rows[header_index + 1:]
         rows_with_cleaned_cells = [map(utils.parse_inner_text_from_html, row.css(
-            'td').extract()) for row in all_rows if row != '']
+            'td').extract()) for row in rows_after_headers if row != '']
 
         if len(rows_with_cleaned_cells) < 2 or len(header_values) < 2:
             raise InvalidTableException()
 
-        # return utils.compose_normalized_table(
-        #     header_values, rows_with_cleaned_cells)
-        return rows_with_cleaned_cells
+        return [header_values] + rows_with_cleaned_cells
 
     @classmethod
     def __find_header_row(cls, rows):
