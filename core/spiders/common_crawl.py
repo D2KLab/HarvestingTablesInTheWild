@@ -1,4 +1,5 @@
 from datetime import datetime
+import traceback
 
 import scrapy
 
@@ -35,6 +36,7 @@ class CommonCrawlTableParserSpider(scrapy.Spider):
             # pylint: disable=broad-except
             except Exception as e:
                 self.logger.error("Failed to parse table on %s: %s", response.url, e)
+                traceback.print_exc()
                 continue
 
             yield CoreDataItem(

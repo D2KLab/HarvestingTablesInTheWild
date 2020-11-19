@@ -22,7 +22,8 @@ class TableParser(ABC):
 
     @classmethod
     def get_table_title(cls, table) -> str:
-        return table.css('caption').get()
+        title = table.css('caption').get() or ""
+        return title
 
     @classmethod
     def get_tables(cls, response):
@@ -50,16 +51,13 @@ class WikitableParser(TableParser):
     @classmethod
     def normalize_table(cls, table):
         all_rows = table.css('tr')
-        headers_per_row = map(lambda x: x.css('th').getall(), all_rows)
-        header_values, header_index = cls.__find_header_row(headers_per_row)
-        if header_index != 0:
-            raise InvalidTableException('Only header in first row supported')
+        header_values, header_index = cls.__find_header_row(table)
 
-        header_values = list(
-            map(utils.parse_inner_text_from_html, header_values))
         rows_after_headers = all_rows[header_index + 1:]
-        rows_with_cleaned_cells = [map(utils.parse_inner_text_from_html, row.css(
-            'td').extract()) for row in rows_after_headers if row != '']
+        rows_with_cleaned_cells = [
+            list(map(utils.parse_inner_text_from_html, row.css('td').extract()))
+            for row in rows_after_headers if row != ''
+        ]
 
         if len(rows_with_cleaned_cells) < 2 or len(header_values) < 2:
             raise InvalidTableException()
@@ -67,7 +65,9 @@ class WikitableParser(TableParser):
         return [header_values] + rows_with_cleaned_cells
 
     @classmethod
-    def __find_header_row(cls, rows):
+    def __find_header_row(cls, table):
+        all_rows = table.css('tr')
+        rows = map(lambda x: x.css('th').getall(), all_rows)
         header_values, header_index = None, -1
         for index, headers in enumerate(rows):
             if len(headers) != 0:
@@ -75,6 +75,9 @@ class WikitableParser(TableParser):
                 header_index = index
         if header_values is None:
             raise InvalidTableException('No headers found on wikitable')
+
+        header_values = list(
+            map(utils.parse_inner_text_from_html, header_values))
 
         return header_values, header_index
 
@@ -84,19 +87,15 @@ class WikitableParser(TableParser):
 
     @classmethod
     def parse_table(cls, table) -> CoreTableItem:
-        try:
-            header_values, _ = cls.__find_header_row(table)
-            return CoreTableItem(
-                table=cls.normalize_table(table),
-                title=cls.get_table_title(table),
-                markup=table.get(),
-                header_position="FIRST_ROW", # TODO: hardcoded
-                headers=header_values,
-                table_type="relation", # TODO: hardcoded
-            )
-        except InvalidTableException:
-            # TODO: keep track of how often this happens
-            pass
+        header_values, _ = cls.__find_header_row(table)
+        return CoreTableItem(
+            table=cls.normalize_table(table),
+            title=cls.get_table_title(table),
+            markup=table.get(),
+            header_position="FIRST_ROW", # TODO: hardcoded
+            headers=header_values,
+            table_type="relation", # TODO: hardcoded
+        )
 
 
 class WellFormattedTableParser(TableParser):
@@ -140,18 +139,14 @@ class WellFormattedTableParser(TableParser):
 
     @classmethod
     def parse_table(cls, table) -> CoreTableItem:
-        try:
-            return CoreTableItem(
-                table=cls.normalize_table(table),
-                title=cls.get_table_title(table),
-                markup=table.get(),
-                header_position="FIRST_ROW", # TODO: hardcoded
-                table_type="relation", # TODO: hardcoded
-                headers=cls.__get_headers_values(table),
-            )
-        except InvalidTableException:
-            # TODO: keep track of how often this happens
-            pass
+        return CoreTableItem(
+            table=cls.normalize_table(table),
+            title=cls.get_table_title(table),
+            markup=table.get(),
+            header_position="FIRST_ROW", # TODO: hardcoded
+            table_type="relation", # TODO: hardcoded
+            headers=cls.__get_headers_values(table),
+        )
 
 
 def get_parser_from_url(url: str) -> TableParser:
