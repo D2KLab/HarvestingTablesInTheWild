@@ -13,6 +13,7 @@ scrapy = "*"
 numpy = "*"
 cdx_toolkit = "*"
 beautifulsoup4 = "*"
+python-arango = "*"
 
 [requires]
 python_version = "3.8"
