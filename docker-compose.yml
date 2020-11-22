@@ -1,5 +1,22 @@
 version: "3.8"
 services:
+  arangodb:
+    image: arangodb:3.7.3
+    # Uncomment to use web interface in development
+    # ports:
+    #   - 8529:8529
+    volumes:
+      - arangodb_data:/var/lib/arango
+    environment:
+      ARANGO_NO_AUTH: 1
+
+  arangodb-test:
+    image: arangodb:3.7.3
+    tmpfs: /var/lib/arango
+    restart: always
+    environment:
+      ARANGO_NO_AUTH: 1
+
   core: &core
     build: .
 
@@ -11,9 +28,16 @@ services:
   test:
     <<: *core
     command: ["python", "-m", "pytest"]
+    environment:
+      ARANGO_HOST: http://arangodb-test:8529
+    depends_on:
+      - arangodb-test
 
   lint:
     <<: *core
     environment:
       REQUIRED_QUALITY: 9
     command: ["pipenv", "run", "lint"]
+
+volumes:
+  arangodb_data:

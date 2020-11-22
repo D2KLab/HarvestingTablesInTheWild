@@ -9,5 +9,3 @@ RUN pip install pipenv
 RUN pipenv install --system --ignore-pipfile --dev
 
 COPY . .
-
-CMD ["scrapy", "crawl", "table_parser"]
