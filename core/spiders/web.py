@@ -8,11 +8,8 @@ from core.parsing.parsers import get_parser_from_url
 from core.items import CoreDataItem
 
 
-class CommonCrawlTableParserSpider(scrapy.Spider):
-    name = "common_crawl_table_parser"
-    custom_settings = {
-        'ROBOTSTXT_OBEY': False
-    }
+class TableParserSpider(scrapy.Spider):
+    name = 'web'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -20,9 +17,11 @@ class CommonCrawlTableParserSpider(scrapy.Spider):
 
     def start_requests(self):
         for url in self.urls:
-            yield scrapy.Request(url, callback=self.parse, meta={'explicit': True})
+            yield scrapy.Request(url=url, callback=self.parse)
 
     def parse(self, response, **kwargs):
+        # the following items are specific to the page,
+        # so we only retrieve them once here
         page_title = get_title_from_text(response)
         parser = get_parser_from_url(response.url)
         timestamp = datetime.now().isoformat()
@@ -55,6 +54,6 @@ class CommonCrawlTableParserSpider(scrapy.Spider):
                 textBeforeTable="", # TODO
                 textAfterTable="", # TODO
                 s3Link="", # TODO
-                recordOffset=0, # TODO
-                recordEndOffset=0, # TODO
+                recordOffset=0,
+                recordEndOffset=0,
             )
