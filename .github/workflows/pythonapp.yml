@@ -1,7 +1,6 @@
 name: Python application
 
-on:
-  push
+on: push
 
 jobs:
   lint:
@@ -14,6 +13,6 @@ jobs:
       - name: Run linting
         run: docker-compose run lint
       - name: Run unit tests
-        run: docker-compose run test
+        run: scripts/run_e2e.sh
       - name: Run integration test
         run: docker-compose run spider
