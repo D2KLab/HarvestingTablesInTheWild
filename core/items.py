@@ -24,6 +24,7 @@ class CoreDataItem: # pylint: disable=too-many-instance-attributes
     """
     External data format which will be used for exporting
     Contains all information and metadata about the table and webpage
+    Format according to data/schema.json
     """
 
     # pylint: disable=invalid-name
@@ -36,7 +37,7 @@ class CoreDataItem: # pylint: disable=too-many-instance-attributes
     relation: List[List[str]]
     s3Link: str
     tableNum: int
-    termSet: List[int]
+    termSet: List[str]
     title: str # table title / caption
     pageTitle: str
     url: str
