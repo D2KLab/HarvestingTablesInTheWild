@@ -94,7 +94,7 @@ class WikitableParser(TableParser):
             markup=table.get(),
             header_position="FIRST_ROW", # TODO: hardcoded
             headers=header_values,
-            table_type="relation", # TODO: hardcoded
+            table_type="RELATION", # TODO: hardcoded
         )
 
 
@@ -144,7 +144,7 @@ class WellFormattedTableParser(TableParser):
             title=cls.get_table_title(table),
             markup=table.get(),
             header_position="FIRST_ROW", # TODO: hardcoded
-            table_type="relation", # TODO: hardcoded
+            table_type="RELATION", # TODO: hardcoded
             headers=cls.__get_headers_values(table),
         )
 
