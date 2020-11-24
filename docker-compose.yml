@@ -33,6 +33,10 @@ services:
     depends_on:
       - arangodb-test
 
+  schema_test:
+    <<: *core
+    command: ["scripts/schema_test.sh"]
+
   lint:
     <<: *core
     environment:
