@@ -1,5 +1,7 @@
 import cdx_toolkit
 
+from monitoring.metrics import metrics
+
 
 class CommonCrawlSearch:
     def __init__(self, limit=1, index_start_month="202005", index_end_month="202006"):
@@ -15,5 +17,6 @@ class CommonCrawlSearch:
                 return search_result_data['filename'], search_result.content
         return None, ""
 
+    @metrics.table_scraping_cc_request_seconds.time()
     def get_html_from_common_crawl(self, url):
         return self.__search_common_crawl(url)

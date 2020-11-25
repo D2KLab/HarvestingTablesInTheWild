@@ -20,10 +20,40 @@ services:
   core: &core
     build: .
 
+  prometheus:
+    image: prom/prometheus:v2.22.2
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus/
+
+  prometheus-push-gw:
+    image: prom/pushgateway:v1.3.0
+    ports:
+      - 9091:9091
+    volumes:
+      - prometheus_push_gw_data:/prometheus/
+    depends_on:
+      - prometheus
+
   spider:
     <<: *core
     environment:
       URL_FILE: "data/test-urls.txt"
+      PROMETHEUS_PUSH_GW: prometheus-push-gw:9091
+    depends_on:
+      - prometheus-push-gw
+    command: ["scrapy", "crawl", "web"]
+
+  cc-spider:
+    <<: *core
+    environment:
+      URL_FILE: data/wikipedia_urls.csv
+      PROMETHEUS_PUSH_GW: prometheus-push-gw:9091
+    depends_on:
+      - prometheus-push-gw
+    command: ["scrapy", "crawl", "common_crawl_table_parser"]
 
   test:
     <<: *core
@@ -41,3 +71,5 @@ services:
 
 volumes:
   arangodb_data:
+  prometheus_push_gw_data:
+  prometheus_data:
