@@ -26,7 +26,7 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock #todo: check if the sock proxy is still required when using KAFKA_ADVERTISED_LISTERNERS. Xref: https://github.com/wurstmeister/kafka-docker/wiki/Connectivity
 
   arangodb-test:
     image: arangodb:3.7.3
