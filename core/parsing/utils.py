@@ -32,6 +32,25 @@ def get_text_before(element) -> str:
     html = element.xpath('./preceding-sibling::*[1]').get()
     return parse_inner_text_from_html(html)
 
+def is_in_form(element) -> bool:
+    """
+    Checks if the given selector is embedded in a <form> element
+    """
+
+    if not element:
+        return False
+
+    parent = element.xpath('..')
+
+    # this condition indicates the end of the recursion
+    if not parent:
+        return False
+
+    if parent.get().startswith('<form'):
+        return True
+
+    return is_in_form(parent)
+
 def get_term_set(html) -> List[str]:
     """
     Returns the 100 most common terms (words) on the web page,
