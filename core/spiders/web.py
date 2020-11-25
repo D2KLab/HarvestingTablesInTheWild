@@ -18,10 +18,6 @@ class TableParserSpider(scrapy.Spider):
         super().__init__(*args, **kwargs)
         self.urls = get_url_list_from_environment()
 
-    @staticmethod
-    def close(spider, reason):
-        metrics.push(spider.name)
-
     def start_requests(self):
         for url in self.urls:
             yield scrapy.Request(url=url, callback=self.parse)
