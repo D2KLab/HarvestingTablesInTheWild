@@ -6,10 +6,12 @@ import scrapy
 from core.parsing.utils import get_url_list_from_environment, get_title_from_text, get_term_set, get_text_before, get_text_after
 from core.parsing.parsers import get_parser_from_url
 from core.items import CoreDataItem
+from core.crawling.strategy import CrawlingStrategy
 
 
 class TableParserSpider(scrapy.Spider):
     name = 'web'
+    crawling_strategy = CrawlingStrategy()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -57,3 +59,7 @@ class TableParserSpider(scrapy.Spider):
                 recordOffset=0,
                 recordEndOffset=0,
             )
+
+        # also crawl all links in the webpage, according to crawl strategy
+        links = CrawlingStrategy.get_links_to_follow(response.url, response.css('body'))
+        yield from response.follow_all(links, callback=self.parse)
