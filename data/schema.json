@@ -1,8 +1,9 @@
 {
     "type":"object",
-    "$schema": "http://json-schema.org/draft-03/schema",
+    "$schema": "http://json-schema.org/draft-04/schema",
     "id": "http://jsonschema.net",
     "description": "A single extracted table including metadata (CoreDataItem)",
+    "required": ["hasHeader", "relation", "tableNum", "termSet", "title", "pageTitle", "url", "headerPosition", "tableType", "markup", "textBeforeTable", "textAfterTable", "headers", "timestamp"],
     "properties":{
         "hasHeader": {
             "type":"boolean",
@@ -64,13 +65,15 @@
         },
         "headerPosition": {
             "type":"string",
+            "enum": ["FIRST_ROW", "FIRST_COLUMN", "NONE", "MIXED"],
             "id": "http://jsonschema.net/headerPosition",
-            "description": "Original position of the <th> tags in the table, if there were any. Possible values: FIRST_ROW, FIRST_COLUMN, NONE, MIXED"
+            "description": "Original position of the <th> tags in the table, if there were any."
         },
         "tableType": {
             "type":"string",
+            "enum": ["RELATION", "MATRIX", "ENTITY", "OTHER"],
             "id": "http://jsonschema.net/tableType",
-            "description": "Result of the table type classification. Possible values: RELATION, MATRIX, ENTITY, OTHER."
+            "description": "Result of the table type classification."
         },
         "markup": {
             "type":"string",
@@ -98,7 +101,8 @@
         },
         "timestamp": {
             "type":"string",
-            "id": "http://jsonschema.net/markup",
+            "id": "http://jsonschema.net/timestamp",
+            "format": "date-time",
             "description": "Timestamp in ISO 8601 format (without timezone) when the website was crawled."
         }
     }
