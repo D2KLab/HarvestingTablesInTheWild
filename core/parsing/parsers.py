@@ -30,7 +30,8 @@ class TableParser(ABC):
         tables = response.css('table')
         for t in tables:
             # remove tables inside forms
-            # how TODO with scrapy selectors?
+            if utils.is_in_form(t):
+                continue
 
             # skip over tables with subtables
             if t.css('table table'):

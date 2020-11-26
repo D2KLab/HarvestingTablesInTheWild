@@ -1,7 +1,12 @@
 import pytest
 
-from core.parsing.utils import validate_body_cell_layout, get_term_set
+from scrapy.selector import Selector
+
+from core.parsing.utils import validate_body_cell_layout, get_term_set, is_in_form
 from core.parsing.exceptions import InvalidTableException
+
+# pylint: disable=singleton-comparison
+# at least in tests I want to be explicit about comparison
 
 def test_check_body_cell_layout():
     # should not raise an exception
@@ -42,3 +47,17 @@ def test_get_term_set():
     want = []
     got = get_term_set(check)
     assert got == want
+
+
+def test_is_in_form():
+    sel = Selector(text='<html><body><span>good</span></body></html>')
+    sel = sel.css('span')
+    assert is_in_form(sel) == False
+
+    sel = Selector(text='<html><body><form><table>bad</table></form></body></html>')
+    sel = sel.css('table')
+    assert is_in_form(sel) == True
+
+    sel = Selector(text='<html><head><title>Hello</title></head><body><table>World</table></body><html>')
+    sel = sel.css('table')
+    assert is_in_form(sel) == False
