@@ -18,8 +18,19 @@ def clean_whitespace(text: str) -> str:
     return text
 
 def parse_inner_text_from_html(html: str) -> str:
+    if not html:
+        return ""
+
     bs = BeautifulSoup(html)
     return clean_whitespace(bs.text)
+
+def get_text_after(element) -> str:
+    html = element.xpath('./following-sibling::*[1]').get()
+    return parse_inner_text_from_html(html)
+
+def get_text_before(element) -> str:
+    html = element.xpath('./preceding-sibling::*[1]').get()
+    return parse_inner_text_from_html(html)
 
 def get_term_set(html) -> List[str]:
     """
@@ -72,8 +83,7 @@ def validate_body_cell_layout(rows: Iterable[List]):  # pylint: disable=useless-
 
 
 def get_title_from_text(response) -> str:
-    return response.css('title::text').getall()[0]
-
+    return response.css('title::text').getall()[0] or ""
 
 def compose_normalized_table(headers: Iterable, rows: Iterable) -> Dict:
     '''

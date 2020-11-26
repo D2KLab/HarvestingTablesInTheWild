@@ -12,7 +12,7 @@ jobs:
         run: docker-compose build core
       - name: Run linting
         run: docker-compose run lint
-      - name: Run unit tests
+      - name: Run database integration tests
         run: scripts/run_e2e.sh
-      - name: Run integration test
-        run: docker-compose run spider
+      - name: Run schema validation test
+        run: docker-compose run schema_test

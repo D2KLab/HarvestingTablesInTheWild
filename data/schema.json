@@ -1,0 +1,109 @@
+{
+    "type":"object",
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "id": "http://jsonschema.net",
+    "description": "A single extracted table including metadata (CoreDataItem)",
+    "required": ["hasHeader", "relation", "tableNum", "termSet", "title", "pageTitle", "url", "headerPosition", "tableType", "markup", "textBeforeTable", "textAfterTable", "headers", "timestamp"],
+    "properties":{
+        "hasHeader": {
+            "type":"boolean",
+            "id": "http://jsonschema.net/hasHeader",
+            "description": "true if the table contained <th> tags in the original HTML"
+        },
+        "recordEndOffset": {
+            "type":"number",
+            "id": "http://jsonschema.net/recordEndOffset",
+            "description": "End of the originating page in the CommonCrawl."
+        },
+        "recordOffset": {
+            "type":"number",
+            "id": "http://jsonschema.net/recordOfffset",
+            "description": "Offset into the CommonCrawl file containing the originating page."
+        },
+        "relation": {
+            "type":"array",
+            "id": "http://jsonschema.net/relation",
+            "description": "Two-dimensional array of string, contains the actual data extracted from the HTML table in column-major format.",
+            "items": {
+                    "type":"array",
+                    "id": "http://jsonschema.net/relation/0"
+                }
+        },
+        "s3Link": {
+            "type":"string",
+            "id": "http://jsonschema.net/s3Link",
+            "description": "Link to the Common Crawl file containing the originating page."
+        },
+        "tableNum": {
+            "type":"number",
+            "id": "http://jsonschema.net/tableNum",
+            "description": "Position of this table in the list of tables contained in the original page. I.e., '3' means this table was extracted from the third <table> tag on the page."
+        },
+        "termSet": {
+            "type":"array",
+            "id": "http://jsonschema.net/termSet",
+            "description": "The 100 most frequent terms (normalized words) in the original page",
+            "items": {
+                    "type":"string",
+                    "id": "http://jsonschema.net/termSet/0"
+                }
+        },
+        "title": {
+            "type":"string",
+            "id": "http://jsonschema.net/title",
+            "description": "Content of a <caption> tag of the table if it existed"
+        },
+        "pageTitle": {
+            "type":"string",
+            "id": "http://jsonschema.net/pageTitle",
+            "description": "Content of a <title> tag of the page the table was extracted from"
+        },
+        "url": {
+            "type":"string",
+            "id": "http://jsonschema.net/url",
+            "description": "URL of the page the table originates from."
+        },
+        "headerPosition": {
+            "type":"string",
+            "enum": ["FIRST_ROW", "FIRST_COLUMN", "NONE", "MIXED"],
+            "id": "http://jsonschema.net/headerPosition",
+            "description": "Original position of the <th> tags in the table, if there were any."
+        },
+        "tableType": {
+            "type":"string",
+            "enum": ["RELATION", "MATRIX", "ENTITY", "OTHER"],
+            "id": "http://jsonschema.net/tableType",
+            "description": "Result of the table type classification."
+        },
+        "markup": {
+            "type":"string",
+            "id": "http://jsonschema.net/markup",
+            "description": "Full HTML markup of the entire <table>."
+        },
+        "textBeforeTable": {
+            "type":"string",
+            "id": "http://jsonschema.net/textBeforeTable",
+            "description": "Parsed text immediately preceeding the table."
+        },
+        "textAfterTable": {
+            "type":"string",
+            "id": "http://jsonschema.net/textAfterTable",
+            "description": "Parsed text immediately following the table."
+        },
+        "headers": {
+            "type":"array",
+            "id": "http://jsonschema.net/headers",
+            "description": "List of parsed table headers",
+            "items": {
+                    "type":"string",
+                    "id": "http://jsonschema.net/headers/0"
+                }
+        },
+        "timestamp": {
+            "type":"string",
+            "id": "http://jsonschema.net/timestamp",
+            "format": "date-time",
+            "description": "Timestamp in ISO 8601 format (without timezone) when the website was crawled."
+        }
+    }
+}
