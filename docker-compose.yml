@@ -19,7 +19,7 @@ services:
     image: wurstmeister/kafka
     ports:
       - "9092:9092"
-    depends_on: 
+    depends_on:
       - zookeeper
     environment:
       KAFKA_LISTENERS: PLAINTEXT://:9092
@@ -42,6 +42,13 @@ services:
     <<: *core
     environment:
       URL_FILE: "data/test-urls.txt"
+    command: ["scrapy", "crawl", "web"]
+
+  cc-spider:
+    <<: *core
+    environment:
+      URL_FILE: data/wikipedia_urls.csv
+    command: ["scrapy", "crawl", "common_crawl_table_parser"]
 
   test:
     <<: *core

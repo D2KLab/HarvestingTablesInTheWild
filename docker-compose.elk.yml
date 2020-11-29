@@ -7,8 +7,7 @@ services:
       args:
         ELK_VERSION: 7.10.0
     volumes:
-      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
-      - elasticsearch:/usr/share/elasticsearch/data
+      - elasticsearch_data:/usr/share/elasticsearch/data
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -26,9 +25,6 @@ services:
       context: logstash/
       args:
         ELK_VERSION: 7.10.0
-    volumes:
-      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
-      - ./logstash/pipeline:/usr/share/logstash/pipeline
     ports:
       - "5044:5044"
       - "5000:5000/tcp"
@@ -46,8 +42,6 @@ services:
       context: kibana/
       args:
         ELK_VERSION: 7.10.0
-    volumes:
-      - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
     ports:
       - "5601:5601"
     networks:
@@ -74,4 +68,4 @@ networks:
     driver: bridge
 
 volumes:
-  elasticsearch:
+  elasticsearch_data:
