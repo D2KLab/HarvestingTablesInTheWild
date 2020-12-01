@@ -15,6 +15,7 @@ numpy = "*"
 cdx_toolkit = "*"
 beautifulsoup4 = "*"
 python-arango = "*"
+scrapy-kafka-export = "*"
 
 [requires]
 python_version = "3.8"

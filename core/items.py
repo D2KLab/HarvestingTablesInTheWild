@@ -3,7 +3,7 @@
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/items.html
 
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from typing import List
 
 @dataclass
@@ -49,3 +49,8 @@ class CoreDataItem: # pylint: disable=too-many-instance-attributes
     textAfterTable: str
     headers: List[str]
     timestamp: str
+
+    # expose a dynamic getter for this item
+    # required for kafka-exporter
+    def get(self, key, default_value=None):
+       return asdict(self).get(key, default_value)
