@@ -1,11 +1,12 @@
 import pytest
+import os
 
 from scrapy.selector import Selector
 
 from core.crawling.strategy import CrawlingStrategy
 
 def test_crawling_strategy():
-    cs = CrawlingStrategy()
+    cs = CrawlingStrategy(follow_links=True)
     html = Selector(text='''
     <html><body>
     <a href="https://en.wikipedia.org/index.php"></a>
@@ -29,4 +30,20 @@ def test_crawling_strategy():
 
     # here we are on tier two domain, so we don't follow any links
     links = list(cs.get_links_to_follow("https://example.com/example.html", html))
+    assert len(links) == 0
+
+def test_crawling_follow():
+    html = Selector(text='<a href="https://en.wikipedia.org/index.php"></a>')
+    links = list(
+        CrawlingStrategy(follow_links=True).
+        get_links_to_follow("//en.wikipedia.org/", html)
+    )
+    assert len(links) == 1
+
+def test_crawling_no_follow():
+    html = Selector(text='<a href="https://en.wikipedia.org/index.php"></a>')
+    links = list(
+        CrawlingStrategy(follow_links=False).
+        get_links_to_follow("//en.wikipedia.org/", html)
+    )
     assert len(links) == 0

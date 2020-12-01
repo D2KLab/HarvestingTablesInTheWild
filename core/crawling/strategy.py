@@ -7,6 +7,10 @@ class CrawlingStrategy:
     Class implementing the two tier approach for selecting which webpages to crawl.
     """
 
+    @classmethod
+    def __init__(cls, follow_links=False):
+        cls.follow_links = follow_links
+
     # Note: r'^(.*\.|)' matches the domain itself including any subdomains
     tier_one_regexes = [re.compile(i) for i in [
         r'^en\.wikipedia\.org',
@@ -61,6 +65,11 @@ class CrawlingStrategy:
     @classmethod
     def get_links_to_follow(cls, url, html) -> Iterable[str]:
         "Extracts and filters all links that should be crawled according to strategy"
+
+        if not cls.follow_links:
+            # only do deep crawls when follow_links is enabled
+            yield from ()
+            return
 
         domain = cls.__get_domain_from_url(url)
         if not cls.__is_tier_one(domain):

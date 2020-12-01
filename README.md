@@ -45,3 +45,7 @@ scrapy crawl web -O output.json
 ```
 
 URLs can either be specified as a string in environment variable `URL_STRING` (e.g. `URL_STRING=http://a.example.com,http://b.example.com`) or loaded from a file specified by `URL_FILE` with one URL per line.
+
+By default, only the specified URLs will be crawled.
+To enable deep crawls, i.e. follow links within those pages, set `FOLLOW_LINKS=true`.
+The crawling strategy can be found in `core/crawling/strategy`.

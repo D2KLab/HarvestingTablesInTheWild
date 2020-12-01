@@ -1,5 +1,6 @@
 from datetime import datetime
 import traceback
+import os
 
 import scrapy
 
@@ -11,7 +12,9 @@ from core.crawling.strategy import CrawlingStrategy
 
 class TableParserSpider(scrapy.Spider):
     name = 'web'
-    crawling_strategy = CrawlingStrategy()
+    crawling_strategy = CrawlingStrategy(
+        follow_links=(os.environ.get('FOLLOW_LINKS') == "true"),
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
