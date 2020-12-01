@@ -9,6 +9,7 @@ def test_crawling_strategy():
     html = Selector(text='''
     <html><body>
     <a href="https://en.wikipedia.org/index.php"></a>
+    <a href="https://abc.wikipedia.org/index.php"></a>
     <a href="https://example.com/index.html"></a>
     <a href="/relative/link"></a>
     <a href="http://example.org"></a>
@@ -18,10 +19,10 @@ def test_crawling_strategy():
 
     # here we are on a tier one domain, so all links should be followed, except the blacklisted ones
     links = list(cs.get_links_to_follow("//en.wikipedia.org/index.php", html))
-    print(links)
     assert 'https://en.wikipedia.org/index.php' in links
     assert 'https://example.com/index.html' in links
     assert '/relative/link' in links
+    assert not 'https://abc.wikipedia.org/index.php' in links
     assert not 'http://example.org' in links
     assert not '#internal-reference' in links
     assert len(links) == 3

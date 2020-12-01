@@ -100,9 +100,8 @@ def validate_body_cell_layout(rows: Iterable[List]):  # pylint: disable=useless-
 
     return None
 
-
 def get_title_from_text(response) -> str:
-    return response.css('title::text').getall()[0] or ""
+    return response.css('title::text').get() or ""
 
 def compose_normalized_table(headers: Iterable, rows: Iterable) -> Dict:
     '''

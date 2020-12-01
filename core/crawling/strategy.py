@@ -1,18 +1,36 @@
 from urllib.parse import urlparse
 from typing import Iterable, List
+import re
 
 class CrawlingStrategy:
     """
     Class implementing the two tier approach for selecting which webpages to crawl.
     """
-    tier_one_list = [
-        'en.wikipedia.org',
-    ]
 
-    domain_blacklist = [
-        'zh.wikipedia.org',
-        'example.org',
-    ]
+    tier_one_regexes = [re.compile(i) for i in [
+        r'en\.wikipedia\.org',
+    ]]
+
+    blacklist_regexes = [re.compile(i) for i in [
+        r'^(?!.*(en)).*\.wikipedia\.org', # blacklist everything except en.wikipedia.org
+        r'example\.org', # for testing purposes, no tables here anyway
+    ]]
+
+    @classmethod
+    def __is_blacklisted(cls, domain: str) -> bool:
+        for regex in cls.blacklist_regexes:
+            if regex.fullmatch(domain) is not None:
+                return True
+
+        return False
+
+    @classmethod
+    def __is_tier_one(cls, domain: str) -> bool:
+        for regex in cls.tier_one_regexes:
+            if regex.fullmatch(domain) is not None:
+                return True
+
+        return False
 
     @classmethod
     def get_links_to_follow(cls, url, html) -> Iterable[str]:
@@ -49,13 +67,3 @@ class CrawlingStrategy:
     def __get_domain_from_url(cls, url: str) -> str:
         o = urlparse(url)
         return o.netloc.split(':')[0]
-
-    @classmethod
-    def __is_blacklisted(cls, domain: str) -> bool:
-        # TODO: implement glob matching (esp. wildcards)
-        return domain in cls.domain_blacklist
-
-    @classmethod
-    def __is_tier_one(cls, domain: str) -> bool:
-        # TODO: implement glob matching (esp. wildcards)
-        return domain in cls.tier_one_list
