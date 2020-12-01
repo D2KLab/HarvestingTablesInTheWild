@@ -16,7 +16,8 @@ services:
       - "2181:2181"
 
   kafka:
-    build: kafka/.
+    build:
+      context: kafka/
     ports:
       - "9092:9092"
       - "7099:7099"
