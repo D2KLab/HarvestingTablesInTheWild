@@ -7,8 +7,34 @@ class CrawlingStrategy:
     Class implementing the two tier approach for selecting which webpages to crawl.
     """
 
+    # Note: r'^(.*\.|)' matches the domain itself including any subdomains
     tier_one_regexes = [re.compile(i) for i in [
-        r'en\.wikipedia\.org',
+        r'^en\.wikipedia\.org',
+        r'^(.*\.|)android\.com',
+        r'^(.*\.|)apache\.org',
+        r'^(.*\.|)bbc\.co\.uk',
+        r'^(.*\.|)blogspot\.com',
+        r'^(.*\.|)creativecommons\.org',
+        r'^(.*\.|)doi\.org',
+        r'^(.*\.|)europe\.eu',
+        r'^(.*\.|)github\.com',
+        r'^(.*\.|)github\.io',
+        r'^(.*\.|)iana\.org',
+        r'^(.*\.|)imdb\.com',
+        r'^(.*\.|)medium\.com',
+        r'^(.*\.|)merriam-webster\.com',
+        r'^(.*\.|)microsoft\.com',
+        r'^(.*\.|)mozilla\.org',
+        r'^(.*\.|)nasa\.gov',
+        r'^(.*\.|)noaa\.gov',
+        r'^(.*\.|)schema\.org',
+        r'^(.*\.|)statista\.com',
+        r'^(.*\.|)w\.org',
+        r'^(.*\.|)wikibooks\.org',
+        r'^(.*\.|)wikimedia\.org',
+        r'^(.*\.|)wikiquote\.org',
+        r'^(.*\.|)wordpress\.org',
+        r'^(.*\.|)yahoo\.com',
     ]]
 
     blacklist_regexes = [re.compile(i) for i in [
