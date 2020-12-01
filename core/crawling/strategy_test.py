@@ -15,6 +15,9 @@ def test_crawling_strategy():
     <a href="/relative/link"></a>
     <a href="http://example.org"></a>
     <a href="#internal-reference"></a>
+    <a href="mailto:max@example.com"></a>
+    <a href="javascript:alert();"></a>
+    <a href="tel:1234"></a>
     </body></html>
     ''')
 
@@ -26,6 +29,9 @@ def test_crawling_strategy():
     assert not 'https://abc.wikipedia.org/index.php' in links
     assert not 'http://example.org' in links
     assert not '#internal-reference' in links
+    assert not 'mailto:max@example.com' in links
+    assert not 'javascript:alert();' in links
+    assert not 'tel:1234' in links
     assert len(links) == 3
 
     # here we are on tier two domain, so we don't follow any links

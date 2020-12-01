@@ -81,8 +81,12 @@ class CrawlingStrategy:
         all_links = html.css('a::attr(href)').getall()
 
         for link in all_links:
-            # skip internal page references
-            if link.startswith('#'):
+
+            # skip internal page references, mailto, javascript and tel links
+            if link.startswith('#') or \
+               link.startswith('mailto:') or \
+               link.startswith('javascript:') or \
+               link.startswith('tel:'):
                 continue
 
             # relative urls are always allowed (same domain)
