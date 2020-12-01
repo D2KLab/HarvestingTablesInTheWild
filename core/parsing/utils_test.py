@@ -38,7 +38,13 @@ def test_get_term_set():
 
     # regular test
     check = 'Hello World!\r\nFoo bar FOO  BAR bar BAZ'
-    want = ['bar', 'foo', 'hello', 'world!', 'baz']
+    want = ['bar', 'foo', 'hello', 'world', 'baz']
+    got = get_term_set(check)
+    assert got == want
+
+    # advanced test
+    check = 'Foo-bar (1912 - 2000)  /   Lorem _ ipsum.BAR;baz'
+    want = ['bar', 'foo', '1912', '2000', 'lorem', 'ipsum', 'baz']
     got = get_term_set(check)
     assert got == want
 

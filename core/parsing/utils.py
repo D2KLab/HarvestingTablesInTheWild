@@ -3,6 +3,7 @@ import os
 from functools import reduce
 from typing import Iterable, Dict, List
 import itertools
+import re
 
 from bs4 import BeautifulSoup
 from scrapy.http.response.html import HtmlResponse
@@ -63,10 +64,15 @@ def get_term_set(html) -> List[str]:
     else:
         raise TypeError('Type must by scrapy.HtmlResponse or str, got:  ' + type(html))
 
+    # convert special characters into whitespace to use them as word boundaries
+    all_fields = [' '.join(re.split('[^a-zA-Z0-9]', f)) for f in fields]
     # convert and reduce all whitespace characters
-    cleaned_fields = map(clean_whitespace, fields)
+    cleaned_fields = map(clean_whitespace, all_fields)
     # split at word boundaries and flatten list
-    split_fields =  list(itertools.chain(*[f.split() for f in cleaned_fields]))
+    split_fields =  list(itertools.chain(*[
+        f.split()
+        for f in cleaned_fields
+    ]))
     # cast all non-empty and non-whitespace fields to lowercase
     non_empty_fields = [f.lower() for f in split_fields if f and not f.isspace()]
     # accumulate to calculate frequencies
