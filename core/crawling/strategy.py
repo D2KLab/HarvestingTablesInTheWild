@@ -1,5 +1,5 @@
 from urllib.parse import urlparse
-from typing import Iterable, List
+from typing import Iterable
 import re
 
 class CrawlingStrategy:

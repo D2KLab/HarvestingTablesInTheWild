@@ -1,5 +1,4 @@
-import pytest
-import os
+#import pytest
 
 from scrapy.selector import Selector
 
@@ -26,12 +25,12 @@ def test_crawling_strategy():
     assert 'https://en.wikipedia.org/index.php' in links
     assert 'https://example.com/index.html' in links
     assert '/relative/link' in links
-    assert not 'https://abc.wikipedia.org/index.php' in links
-    assert not 'http://example.org' in links
-    assert not '#internal-reference' in links
-    assert not 'mailto:max@example.com' in links
-    assert not 'javascript:alert();' in links
-    assert not 'tel:1234' in links
+    assert 'https://abc.wikipedia.org/index.php' not in links
+    assert 'http://example.org' not in links
+    assert '#internal-reference' not in links
+    assert 'mailto:max@example.com' not in links
+    assert 'javascript:alert();' not in links
+    assert 'tel:1234' not in links
     assert len(links) == 3
 
     # here we are on tier two domain, so we don't follow any links
