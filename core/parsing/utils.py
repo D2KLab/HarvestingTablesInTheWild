@@ -3,6 +3,7 @@ import os
 from functools import reduce
 from typing import Iterable, Dict, List
 import itertools
+import re
 
 from bs4 import BeautifulSoup
 from scrapy.http.response.html import HtmlResponse
@@ -18,8 +19,38 @@ def clean_whitespace(text: str) -> str:
     return text
 
 def parse_inner_text_from_html(html: str) -> str:
+    if not html:
+        return ""
+
     bs = BeautifulSoup(html)
     return clean_whitespace(bs.text)
+
+def get_text_after(element) -> str:
+    html = element.xpath('./following-sibling::*[1]').get()
+    return parse_inner_text_from_html(html)
+
+def get_text_before(element) -> str:
+    html = element.xpath('./preceding-sibling::*[1]').get()
+    return parse_inner_text_from_html(html)
+
+def is_in_form(element) -> bool:
+    """
+    Checks if the given selector is embedded in a <form> element
+    """
+
+    if not element:
+        return False
+
+    parent = element.xpath('..')
+
+    # this condition indicates the end of the recursion
+    if not parent:
+        return False
+
+    if parent.get().startswith('<form'):
+        return True
+
+    return is_in_form(parent)
 
 def get_term_set(html) -> List[str]:
     """
@@ -33,10 +64,15 @@ def get_term_set(html) -> List[str]:
     else:
         raise TypeError('Type must by scrapy.HtmlResponse or str, got:  ' + type(html))
 
+    # convert special characters into whitespace to use them as word boundaries
+    all_fields = [' '.join(re.split('[^a-zA-Z0-9]', f)) for f in fields]
     # convert and reduce all whitespace characters
-    cleaned_fields = map(clean_whitespace, fields)
+    cleaned_fields = map(clean_whitespace, all_fields)
     # split at word boundaries and flatten list
-    split_fields =  list(itertools.chain(*[f.split() for f in cleaned_fields]))
+    split_fields =  list(itertools.chain(*[
+        f.split()
+        for f in cleaned_fields
+    ]))
     # cast all non-empty and non-whitespace fields to lowercase
     non_empty_fields = [f.lower() for f in split_fields if f and not f.isspace()]
     # accumulate to calculate frequencies
@@ -70,10 +106,8 @@ def validate_body_cell_layout(rows: Iterable[List]):  # pylint: disable=useless-
 
     return None
 
-
 def get_title_from_text(response) -> str:
-    return response.css('title::text').getall()[0]
-
+    return response.css('title::text').get() or ""
 
 def compose_normalized_table(headers: Iterable, rows: Iterable) -> Dict:
     '''

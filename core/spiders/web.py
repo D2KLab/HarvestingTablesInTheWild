@@ -1,15 +1,20 @@
 from datetime import datetime
 import traceback
+import os
 
 import scrapy
 
-from core.parsing.utils import get_url_list_from_environment, get_title_from_text, get_term_set
+from core.parsing.utils import get_url_list_from_environment, get_title_from_text, get_term_set, get_text_before, get_text_after
 from core.parsing.parsers import get_parser_from_url
 from core.items import CoreDataItem
+from core.crawling.strategy import CrawlingStrategy
 
 
 class TableParserSpider(scrapy.Spider):
     name = 'web'
+    crawling_strategy = CrawlingStrategy(
+        follow_links=(os.environ.get('FOLLOW_LINKS') == "true"),
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -51,9 +56,13 @@ class TableParserSpider(scrapy.Spider):
                 url=response.url,
                 timestamp=timestamp,
                 markup=table.get(),
-                textBeforeTable="", # TODO
-                textAfterTable="", # TODO
-                s3Link="", # TODO
+                textBeforeTable=get_text_before(table),
+                textAfterTable=get_text_after(table),
+                s3Link="",
                 recordOffset=0,
                 recordEndOffset=0,
             )
+
+        # also crawl all links in the webpage, according to crawl strategy
+        links = CrawlingStrategy.get_links_to_follow(response.url, response.css('body'))
+        yield from response.follow_all(links, callback=self.parse)

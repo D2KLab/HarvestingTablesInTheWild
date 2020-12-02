@@ -23,14 +23,15 @@ class TableParser(ABC):
     @classmethod
     def get_table_title(cls, table) -> str:
         title = table.css('caption').get() or ""
-        return title
+        return utils.clean_whitespace(title)
 
     @classmethod
     def get_tables(cls, response):
         tables = response.css('table')
         for t in tables:
             # remove tables inside forms
-            # how TODO with scrapy selectors?
+            if utils.is_in_form(t):
+                continue
 
             # skip over tables with subtables
             if t.css('table table'):
@@ -94,7 +95,7 @@ class WikitableParser(TableParser):
             markup=table.get(),
             header_position="FIRST_ROW", # TODO: hardcoded
             headers=header_values,
-            table_type="relation", # TODO: hardcoded
+            table_type="RELATION", # TODO: hardcoded
         )
 
 
@@ -144,7 +145,7 @@ class WellFormattedTableParser(TableParser):
             title=cls.get_table_title(table),
             markup=table.get(),
             header_position="FIRST_ROW", # TODO: hardcoded
-            table_type="relation", # TODO: hardcoded
+            table_type="RELATION", # TODO: hardcoded
             headers=cls.__get_headers_values(table),
         )
 
