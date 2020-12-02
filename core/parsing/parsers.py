@@ -23,7 +23,7 @@ class TableParser(ABC):
     @classmethod
     def get_table_title(cls, table) -> str:
         title = table.css('caption').get() or ""
-        return title
+        return utils.clean_whitespace(title)
 
     @classmethod
     def get_tables(cls, response):

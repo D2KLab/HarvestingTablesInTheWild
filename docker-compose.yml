@@ -44,6 +44,7 @@ services:
     <<: *core
     environment:
       URL_FILE: "data/test-urls.txt"
+      FOLLOW_LINKS: "false" # "true" for deep crawls
 
   test:
     <<: *core
