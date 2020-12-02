@@ -9,11 +9,13 @@
 ## Installation
 
 For installing runtime dependencies:
+
 ```bash
 pipenv install
 ```
 
 For also installing development dependencies (linting & testing):
+
 ```
 pipenv install --dev
 ```
@@ -49,3 +51,32 @@ URLs can either be specified as a string in environment variable `URL_STRING` (e
 By default, only the specified URLs will be crawled.
 To enable deep crawls, i.e. follow links within those pages, set `FOLLOW_LINKS=true`.
 The crawling strategy can be found in `core/crawling/strategy`.
+
+## Monitoring/Logging
+
+### Setup
+
+```bash
+# Kibana will take a while to initialize...
+docker-compose -f docker-compose.elk.yml up --build kibana
+# logspout is a container for redirecting docker logs to elasticsearch
+# run it after kibana is ready
+docker-compose -f docker-compose.elk.yml up --build logspout
+```
+
+### Usage
+
+Navigate to [http://localhost:5601/](http://localhost:5601/).
+These are container logs, so if you want only logs from specific containers, you could eg. query:
+
+Logs for web spider
+
+```kql
+docker.image : harvestingtablesinthewild_spider
+```
+
+Logs for common crawl spider
+
+```kql
+docker.image : harvestingtablesinthewild_cc
+```
