@@ -22,7 +22,10 @@ class TableParserSpider(scrapy.Spider):
 
     def start_requests(self):
         for url in self.urls:
-            yield scrapy.Request(url=url, callback=self.parse)
+            yield scrapy.Request(url=url,
+                                 callback=self.parse,
+                                 meta={'crawl_once': True},
+                                 )
 
     def parse(self, response, **kwargs):
         # the following items are specific to the page,

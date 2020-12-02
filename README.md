@@ -57,6 +57,9 @@ By default, only the specified URLs will be crawled.
 To enable deep crawls, i.e. follow links within those pages, set `FOLLOW_LINKS=true`.
 The crawling strategy can be found in `core/crawling/strategy`.
 
+To avoid visiting the same URL multiple times, set the environment variable `CRAWL_ONCE=true` (this is the default inside the container).
+The database with the visited URLs is kept in `.scrapy/crawl_once/web.sqlite`.
+
 ### Kafka
 
 The export of scraped items to Kafka can be enabled by setting the environment variable `KAFKA_EXPORT=true`.
