@@ -3,16 +3,17 @@ name: Python application
 on: push
 
 jobs:
-  lint:
+  test:
     name: Lint & Test
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v2
       - name: Build core container
         run: docker-compose build core
       - name: Run linting
         run: docker-compose run lint
-      - name: Run database integration tests
+      - name: Run unit tests with database
         run: scripts/run_e2e.sh
       - name: Run schema validation test
         run: docker-compose run schema_test
