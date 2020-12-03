@@ -6,7 +6,7 @@ import itertools
 import re
 
 from bs4 import BeautifulSoup
-from scrapy.http.response.html import HtmlResponse
+from scrapy.http.response.text import TextResponse
 
 from core.parsing.exceptions import InvalidTableException
 
@@ -22,7 +22,7 @@ def parse_inner_text_from_html(html: str) -> str:
     if not html:
         return ""
 
-    bs = BeautifulSoup(html)
+    bs = BeautifulSoup(html, features='lxml')
     return clean_whitespace(bs.text)
 
 def get_text_after(element) -> str:
@@ -59,10 +59,10 @@ def get_term_set(html) -> List[str]:
     """
     if isinstance(html, str):
         fields = html.split() # split into fields
-    elif isinstance(html, HtmlResponse):
+    elif isinstance(html, TextResponse):
         fields = html.css('body *::text').getall()
     else:
-        raise TypeError('Type must by scrapy.HtmlResponse or str, got:  ' + type(html))
+        raise TypeError('Type must by scrapy.TextResponse or str, got:  ' + str(type(html)))
 
     # convert special characters into whitespace to use them as word boundaries
     all_fields = [' '.join(re.split('[^a-zA-Z0-9]', f)) for f in fields]
