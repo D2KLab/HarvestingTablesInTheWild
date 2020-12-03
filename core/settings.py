@@ -1,3 +1,5 @@
+import os
+
 # Scrapy settings for core project
 #
 # For simplicity, this file contains only settings considered important or
@@ -65,9 +67,17 @@ DOWNLOADER_MIDDLEWARES = {
 
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
-# EXTENSIONS = {
-#    'scrapy.extensions.telnet.TelnetConsole': None,
-# }
+EXTENSIONS = {
+   'scrapy.extensions.telnet.TelnetConsole': None,
+   'scrapy_kafka_export.KafkaItemExporterExtension': 1,
+}
+
+# Kafka Exporter configuration, see https://github.com/TeamHG-Memex/scrapy-kafka-export
+KAFKA_EXPORT_ENABLED = (os.environ.get('KAFKA_EXPORT', 'false') == 'true')
+KAFKA_BROKERS = [
+    'kafka:9092', # see docker-compose.yml
+]
+KAFKA_TOPIC = 'tablecollector'
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html

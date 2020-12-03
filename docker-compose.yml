@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.3"
 services:
   arangodb:
     image: arangodb:3.7.3
@@ -24,9 +24,10 @@ services:
       - zookeeper
     environment:
       KAFKA_LISTENERS: PLAINTEXT://:9092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_CREATE_TOPICS: "test_topic:2:1" # name:partition:replicas
+      KAFKA_CREATE_TOPICS: "tablecollector:2:1" # name:partition:replicas
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
       EXTRA_ARGS: -javaagent:/usr/app/jmx_prometheus_javaagent.jar=7099:/usr/app/prom-jmx-agent-config.yml
 
@@ -45,12 +46,14 @@ services:
     environment:
       URL_FILE: "data/test-urls.txt"
       FOLLOW_LINKS: "false" # "true" for deep crawls
+      KAFKA_EXPORT: "true"
     command: ["scrapy", "crawl", "web"]
 
   cc-spider:
     <<: *core
     environment:
       URL_FILE: data/wikipedia_urls.csv
+      KAFKA_EXPORT: "true"
     command: ["scrapy", "crawl", "common_crawl_table_parser"]
 
   test:

@@ -36,12 +36,17 @@ Tests:
 docker-compose up --build test
 ```
 
-## Run
+## Pipeline
 
+Scrapy Spider -> Kafka Message Queue -> ArangoDB document store
+
+### Scrapy
+
+Run with:
 ```bash
-docker-compose up --build spider
+docker-compose up --build spider # or "cc-spider"
 # or
-scrapy crawl web
+scrapy crawl web # or "common_crawl_table_parser"
 # output items as JSON
 scrapy crawl web -O output.json
 ```
@@ -51,6 +56,39 @@ URLs can either be specified as a string in environment variable `URL_STRING` (e
 By default, only the specified URLs will be crawled.
 To enable deep crawls, i.e. follow links within those pages, set `FOLLOW_LINKS=true`.
 The crawling strategy can be found in `core/crawling/strategy`.
+
+### Kafka
+
+The export of scraped items to Kafka can be enabled by setting the environment variable `KAFKA_EXPORT=true`.
+The topic is called `tablecollector`.
+
+Some commands for debugging with Kafka:
+```
+# open shell inside running spider container
+docker exec -it htw_kafka_1
+
+# install kafkacat
+apt update && apt install -y kafkacat
+
+# print queue metadata
+kafkacat -b kafka:9092 -t tablecollector -L
+> Metadata for tablecollector (from broker 1001: kafka:9092/1001):
+>  1 brokers:
+>   broker 1001 at kafka:9092
+>  1 topics:
+>   topic "tablecollector" with 2 partitions:
+>     partition 0, leader 1001, replicas: 1001, isrs: 1001
+>     partition 1, leader 1001, replicas: 1001, isrs: 1001
+
+
+# act as a listener (consumer)
+kafkacat -b kafka:9092 -t tablecollector -C
+> % Reached end of topic tablecollector [1] at offset XXX
+
+# act as a sender (producer)
+kafkacat -b kafka:9092 -t tablecollector -P
+(type and hit enter)
+```
 
 ## Monitoring/Logging
 
