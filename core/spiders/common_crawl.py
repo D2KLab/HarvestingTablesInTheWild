@@ -20,7 +20,10 @@ class CommonCrawlTableParserSpider(scrapy.Spider):
 
     def start_requests(self):
         for url in self.urls:
-            yield scrapy.Request(url, callback=self.parse, meta={'explicit': True})
+            yield scrapy.Request(url,
+                                 callback=self.parse,
+                                 meta={'explicit': True, 'crawl_once': True},
+                                 )
 
     def parse(self, response, **kwargs):
         page_title = get_title_from_text(response)

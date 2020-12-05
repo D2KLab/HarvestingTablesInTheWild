@@ -47,6 +47,7 @@ services:
       URL_FILE: "data/test-urls.txt"
       FOLLOW_LINKS: "false" # "true" for deep crawls
       KAFKA_EXPORT: "true"
+      CRAWL_ONCE: "true"
     command: ["scrapy", "crawl", "web"]
 
   cc-spider:
@@ -54,6 +55,7 @@ services:
     environment:
       URL_FILE: data/wikipedia_urls.csv
       KAFKA_EXPORT: "true"
+      CRAWL_ONCE: "true"
     command: ["scrapy", "crawl", "common_crawl_table_parser"]
 
   test:
