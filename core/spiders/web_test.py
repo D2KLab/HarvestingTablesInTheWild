@@ -1,7 +1,5 @@
 import os
 
-import pytest
-
 from scrapy.http.response.text import TextResponse
 
 from core.spiders.web import TableParserSpider
@@ -9,8 +7,8 @@ from core.spiders.fixtures.w3_schools import w3_schools
 from core.spiders.fixtures.wiki_nhl import wiki_nhl
 
 
-def test_parse_w3_html_tables(w3_schools):
-    url, html, expected_output = w3_schools
+def test_parse_w3_html_tables():
+    url, html, expected_output = w3_schools()
 
     resp = TextResponse(url, body=html)
     os.environ['URL_STRING'] = url
@@ -23,8 +21,8 @@ def test_parse_w3_html_tables(w3_schools):
 
     assert got == expected_output
 
-def test_parse_wikipedia_nhl(wiki_nhl):
-    url, html, expected_output = wiki_nhl
+def test_parse_wikipedia_nhl():
+    url, html, expected_output = wiki_nhl()
 
     resp = TextResponse(url, body=html)
     os.environ['URL_STRING'] = url

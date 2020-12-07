@@ -1,8 +1,5 @@
-import pytest
-
 from core.items import CoreDataItem
 
-@pytest.fixture
 def wiki_nhl():
     url = 'https://en.wikipedia.org/wiki/National_Hockey_League_all-time_results'
 

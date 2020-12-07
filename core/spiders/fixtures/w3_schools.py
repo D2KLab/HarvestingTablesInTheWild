@@ -1,8 +1,5 @@
-import pytest
-
 from core.items import CoreDataItem
 
-@pytest.fixture
 def w3_schools():
     url = 'https://www.w3schools.com/html/html_tables.asp'
 
