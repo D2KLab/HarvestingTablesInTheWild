@@ -17,6 +17,7 @@ beautifulsoup4 = "*"
 python-arango = "*"
 scrapy-kafka-export = "*"
 scrapy-crawl-once = "*"
+confusables = "*"
 
 [requires]
 python_version = "3.8"
