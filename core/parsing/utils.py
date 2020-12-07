@@ -1,30 +1,15 @@
 import csv
 import os
 from typing import Iterable, List
-import itertools
-import re
 
 from bs4 import BeautifulSoup
-from confusables import normalize as normalize_unicode
 from scrapy.http.response.html import HtmlResponse
 
 from core.parsing.exceptions import InvalidTableException
+from core.normalization import clean_unicode, clean_whitespace, get_n_most_common_terms
 
 
 MIN_BODY_ROWS = 2
-
-
-def clean_whitespace(text: str) -> str:
-    # remove tabs, newlines and other whitespace (also leading/trailing)
-    text = ' '.join(text.split())
-    return text
-
-
-def clean_unicode(text: str) -> str:
-    possible_normalizations = normalize_unicode(text, prioritize_alpha=True)
-    # The first item is closest to the original text
-    # https://www.unicode.org/Public/security/latest/confusables.txt
-    return possible_normalizations[0]
 
 
 def parse_inner_text_from_html(html: str) -> str:
@@ -79,29 +64,11 @@ def get_term_set(html) -> List[str]:
         raise TypeError(
             'Type must by scrapy.HtmlResponse or str, got:  ' + type(html))
 
-    fields = map(clean_unicode, fields)
-    # convert special characters into whitespace to use them as word boundaries
-    all_fields = [' '.join(re.split('[^a-zA-Z0-9]', f)) for f in fields]
-    # convert and reduce all whitespace characters
-    cleaned_fields = map(clean_whitespace, all_fields)
-    # split at word boundaries and flatten list
-    split_fields = list(itertools.chain(*[
-        f.split()
-        for f in cleaned_fields
-    ]))
-    # cast all non-empty and non-whitespace fields to lowercase
-    non_empty_fields = [f.lower()
-                        for f in split_fields if f and not f.isspace()]
-    # accumulate to calculate frequencies
-    term_freq = {}
-    for f in non_empty_fields:
-        term_freq[f] = term_freq.get(f, 0) + 1
+    unicode_cleaned_fields = map(clean_unicode, fields)
+    cleaned_fields = map(clean_whitespace, unicode_cleaned_fields)
+    cleaned_text = ' '.join(cleaned_fields)
 
-    sorted_terms = [term for term, freq in sorted(
-        term_freq.items(), key=lambda item: item[1], reverse=True)]
-
-    # return at most 100 items
-    return sorted_terms[0:100]
+    return get_n_most_common_terms(cleaned_text, 100)
 
 
 def validate_body_cell_layout(rows: Iterable[List]):  # pylint: disable=useless-return

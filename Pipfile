@@ -18,6 +18,7 @@ python-arango = "*"
 scrapy-kafka-export = "*"
 scrapy-crawl-once = "*"
 confusables = "*"
+spacy = "*"
 
 [requires]
 python_version = "3.8"
