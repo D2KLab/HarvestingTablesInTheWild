@@ -1,5 +1,7 @@
 import csv
 import os
+import re
+import itertools
 from typing import Iterable, List
 
 from bs4 import BeautifulSoup
@@ -64,8 +66,16 @@ def get_term_set(html) -> List[str]:
         raise TypeError(
             'Type must by scrapy.HtmlResponse or str, got:  ' + type(html))
 
-    unicode_cleaned_fields = map(clean_unicode, fields)
-    cleaned_fields = map(clean_whitespace, unicode_cleaned_fields)
+    unicode_cleaned_fields = list(map(clean_unicode, fields))
+    # convert special characters into whitespace to use them as word boundaries
+    ascii_fields = [' '.join(re.split('[^a-zA-Z0-9]', f))
+                    for f in unicode_cleaned_fields]
+    # split at word boundaries and flatten list
+    split_ascii_fields = list(itertools.chain(*[
+        f.split()
+        for f in ascii_fields
+    ]))
+    cleaned_fields = list(map(clean_whitespace, split_ascii_fields))
     cleaned_text = ' '.join(cleaned_fields)
 
     return get_n_most_common_terms(cleaned_text, 100)

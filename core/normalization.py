@@ -9,9 +9,13 @@ en_nlp = load_nlp('en')
 
 def get_n_most_common_terms(text: str, n: int) -> List[str]:
     doc = en_nlp(text)
-    nouns = [chunk.text for chunk in doc.noun_chunks]
-    verbs = [token.lemma_ for token in doc if token.pos_ == 'VERB']
-    normalized_fields = nouns + verbs
+    # Helpful reading:
+    # https://spacy.io/usage/linguistic-features
+    # https://universaldependencies.org/docs/u/pos/
+    pos_blacklist = ['ADP', 'SYM', 'PUNCT', 'X']
+    normalized_fields = [
+        token.lemma_ for token in doc if not token.pos_ in pos_blacklist
+    ]
 
     counter = Counter(normalized_fields)
     most_common_tuples = counter.most_common(n)
