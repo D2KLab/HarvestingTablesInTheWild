@@ -1,8 +1,8 @@
+import unicodedata
 from typing import List
 from collections import Counter
 
 from spacy import load as load_nlp
-from confusables import normalize as normalize_unicode
 
 en_nlp = load_nlp('en')
 
@@ -12,7 +12,7 @@ def get_n_most_common_terms(text: str, n: int) -> List[str]:
     # Helpful reading:
     # https://spacy.io/usage/linguistic-features
     # https://universaldependencies.org/docs/u/pos/
-    pos_blacklist = ['ADP', 'SYM', 'PUNCT', 'X']
+    pos_blacklist = ['ADP', 'SYM', 'DET', 'PUNCT', 'X']
     normalized_fields = [
         token.lemma_ for token in doc if not token.pos_ in pos_blacklist
     ]
@@ -30,7 +30,5 @@ def clean_whitespace(text: str) -> str:
 
 
 def clean_unicode(text: str) -> str:
-    possible_normalizations = normalize_unicode(text, prioritize_alpha=True)
-    # The first item is closest to the original text
-    # https://www.unicode.org/Public/security/latest/confusables.txt
-    return possible_normalizations[0]
+    # https://en.wikipedia.org/wiki/Unicode_equivalence#Normalization
+    return unicodedata.normalize('NFKD', text)

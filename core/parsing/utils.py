@@ -68,14 +68,19 @@ def get_term_set(html) -> List[str]:
 
     unicode_cleaned_fields = list(map(clean_unicode, fields))
     # convert special characters into whitespace to use them as word boundaries
-    ascii_fields = [' '.join(re.split('[^a-zA-Z0-9]', f))
-                    for f in unicode_cleaned_fields]
+    all_fields = [' '.join(re.split('[^a-zA-Z0-9]', f))
+                  for f in unicode_cleaned_fields]
+    # convert and reduce all whitespace characters
+    cleaned_fields = map(clean_whitespace, all_fields)
     # split at word boundaries and flatten list
-    split_ascii_fields = list(itertools.chain(*[
+    split_fields = list(itertools.chain(*[
         f.split()
-        for f in ascii_fields
+        for f in cleaned_fields
     ]))
-    cleaned_fields = list(map(clean_whitespace, split_ascii_fields))
+    # cast all non-empty and non-whitespace fields to lowercase
+    non_empty_fields = [f.lower()
+                        for f in split_fields if f and not f.isspace()]
+    cleaned_fields = list(map(clean_whitespace, non_empty_fields))
     cleaned_text = ' '.join(cleaned_fields)
 
     return get_n_most_common_terms(cleaned_text, 100)
