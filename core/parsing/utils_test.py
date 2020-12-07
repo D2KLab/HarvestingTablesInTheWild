@@ -49,6 +49,12 @@ def test_get_term_set():
     got = get_term_set(check)
     assert got == want
 
+    # another advanced test
+    check = 'To the foo of the bar with a baz in the foo'
+    want = ['foo', 'bar', 'baz']
+    got = get_term_set(check)
+    assert got == want
+
     # edge case
     check = "  \r\n \t"
     want = []
