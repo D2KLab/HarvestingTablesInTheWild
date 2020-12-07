@@ -26,7 +26,6 @@ services:
       KAFKA_LISTENERS: PLAINTEXT://:9092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPICS: "test_topic:2:1" # name:partition:replicas
       KAFKA_CREATE_TOPICS: "tablecollector:2:1" # name:partition:replicas
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
       EXTRA_ARGS: -javaagent:/usr/app/jmx_prometheus_javaagent.jar=7099:/usr/app/prom-jmx-agent-config.yml
