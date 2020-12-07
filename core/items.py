@@ -54,3 +54,8 @@ class CoreDataItem: # pylint: disable=too-many-instance-attributes
     # required for kafka-exporter
     def get(self, key, default_value=None):
        return asdict(self).get(key, default_value)
+
+   # method that makes this item comparable
+   # required for unit tests
+    def __eq__(self, other):
+        return asdict(self) == asdict(other)

@@ -5,7 +5,7 @@ import itertools
 from typing import Iterable, List
 
 from bs4 import BeautifulSoup
-from scrapy.http.response.html import HtmlResponse
+from scrapy.http.response.text import TextResponse
 
 from core.parsing.exceptions import InvalidTableException
 from core.normalization import clean_unicode, clean_whitespace, get_n_most_common_terms
@@ -18,7 +18,7 @@ def parse_inner_text_from_html(html: str) -> str:
     if not html:
         return ""
 
-    bs = BeautifulSoup(html)
+    bs = BeautifulSoup(html, features='lxml')
     cleaned_whitespace = clean_whitespace(bs.text)
     return clean_unicode(cleaned_whitespace)
 
@@ -60,11 +60,11 @@ def get_term_set(html) -> List[str]:
     """
     if isinstance(html, str):
         fields = html.split()  # split into fields
-    elif isinstance(html, HtmlResponse):
+    elif isinstance(html, TextResponse):
         fields = html.css('body *::text').getall()
     else:
         raise TypeError(
-            'Type must by scrapy.HtmlResponse or str, got:  ' + type(html))
+            'Type must by scrapy.TextResponse or str, got:  ' + str(type(html)))
 
     unicode_cleaned_fields = list(map(clean_unicode, fields))
     # convert special characters into whitespace to use them as word boundaries
