@@ -91,6 +91,7 @@ def validate_body_cell_layout(rows: Iterable[List]):  # pylint: disable=useless-
     Checks that the layout of the table body is regular, i.e.
     that there is no row with more columns than the most
     common number of columns
+    Returns the dimensions (rows, columns) of the table
     Raises InvalidTableException when a requirements is not satisfied
     """
     if len(rows) < MIN_BODY_ROWS:
@@ -107,7 +108,7 @@ def validate_body_cell_layout(rows: Iterable[List]):  # pylint: disable=useless-
         raise InvalidTableException(
             'Maximum number of columns exceed most common number of columns')
 
-    return None
+    return len(rows), max_cols
 
 
 def get_title_from_text(response) -> str:

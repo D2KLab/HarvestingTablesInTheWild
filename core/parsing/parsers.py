@@ -89,16 +89,17 @@ class WikitableParser(TableParser):
     @classmethod
     def parse_table(cls, table) -> CoreTableItem:
         header_values, _ = cls.__find_header_row(table)
+        relation = cls.normalize_table(table)
         return CoreTableItem(
-            table=cls.normalize_table(table),
+            table=relation,
             title=cls.get_table_title(table),
             markup=table.get(),
             header_position="FIRST_ROW",  # TODO: hardcoded
             headers=header_values,
             table_type="RELATION",  # TODO: hardcoded
             orientation="VERTICAL",  # TODO: hardcoded
-            nb_columns=0,  # TODO
-            nb_rows=0,  # TODO
+            nb_columns=len(relation[0]),
+            nb_rows=len(relation),
         )
 
 
@@ -130,9 +131,10 @@ class WellFormattedTableParser(TableParser):
         # combine header and body into one relation
         relation = [header_values] + body_rows
         # basic sanity check for body, will raise on error
-        utils.validate_body_cell_layout(relation)
+        nb_rows, nb_columns = utils.validate_body_cell_layout(relation)
 
-        return relation
+        return relation, nb_rows, nb_columns
+
 
     @classmethod
     def __get_headers_values(cls, table) -> List[str]:
@@ -143,16 +145,17 @@ class WellFormattedTableParser(TableParser):
 
     @classmethod
     def parse_table(cls, table) -> CoreTableItem:
+        relation, nb_rows, nb_columns = cls.normalize_table(table)
         return CoreTableItem(
-            table=cls.normalize_table(table),
+            table=relation,
             title=cls.get_table_title(table),
             markup=table.get(),
             header_position="FIRST_ROW",  # TODO: hardcoded
             table_type="RELATION",  # TODO: hardcoded
             headers=cls.__get_headers_values(table),
             orientation="VERTICAL", # TODO: hardcoded
-            nb_columns=0, # TODO
-            nb_rows=0, # TODO
+            nb_columns=nb_columns,
+            nb_rows=nb_rows,
         )
 
 

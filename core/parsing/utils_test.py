@@ -15,7 +15,7 @@ def test_check_body_cell_layout():
         ["A", "B", "C"],
         ["1", "2", "3"],
         ["4", "5", "6"],
-    ]) is None
+    ]) == (3,3)
 
     # should raise an exception (too short)
     with pytest.raises(InvalidTableException):

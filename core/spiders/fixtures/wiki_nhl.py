@@ -620,6 +620,9 @@ def wiki_nhl():
             recordOffset=0,
             recordEndOffset=0,
             language="en",
+            nbRows=40,
+            nbColumns=10,
+            tableOrientation="VERTICAL",
         ),
     ]
 
