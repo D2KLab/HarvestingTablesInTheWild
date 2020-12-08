@@ -8,6 +8,7 @@ from core.parsing.exceptions import InvalidTableException
 # pylint: disable=singleton-comparison
 # at least in tests I want to be explicit about comparison
 
+
 def test_check_body_cell_layout():
     # should not raise an exception
     assert validate_body_cell_layout([
@@ -48,6 +49,12 @@ def test_get_term_set():
     got = get_term_set(check)
     assert got == want
 
+    # another advanced test
+    check = 'To the foo of the bar with a baz in the foo'
+    want = ['foo', 'bar', 'baz']
+    got = get_term_set(check)
+    assert got == want
+
     # edge case
     check = "  \r\n \t"
     want = []
@@ -60,10 +67,12 @@ def test_is_in_form():
     sel = sel.css('span')
     assert is_in_form(sel) == False
 
-    sel = Selector(text='<html><body><form><table>bad</table></form></body></html>')
+    sel = Selector(
+        text='<html><body><form><table>bad</table></form></body></html>')
     sel = sel.css('table')
     assert is_in_form(sel) == True
 
-    sel = Selector(text='<html><head><title>Hello</title></head><body><table>World</table></body><html>')
+    sel = Selector(
+        text='<html><head><title>Hello</title></head><body><table>World</table></body><html>')
     sel = sel.css('table')
     assert is_in_form(sel) == False

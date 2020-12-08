@@ -200,10 +200,11 @@ padding-left:6px;
 .w3-theme {color:#fff !important;background-color:#73AD21 !important;background-color:#4CAF50 !important}
 .w3-theme-border {border-color:#4CAF50 !important}
 .sharethis a:hover {color:inherit;}
-.fa-facebook-square,.fa-twitter-square,.fa-google-plus-square {padding:0 8px;}
+.fa-facebook-square,.fa-instagram,.fa-linkedin-square {padding:0 2px;}
 .fa-facebook-square:hover, .fa-thumbs-o-up:hover {color:#3B5998;}
+.fa-instagram:hover {color:#8a3ab9;}
+.fa-linkedin-square:hover {color:#2867B2;}
 .fa-twitter-square:hover {color:#55acee;}
-.fa-google-plus-square:hover {color:#dd4b39;}
 #google_translate_element img {margin-bottom:-1px;}
 #googleSearch {color:#000000;}
 #googleSearch a {padding:0 !important;}
@@ -269,11 +270,10 @@ transform:translate(0, 0);
 .fa-globe:before {content:'\e801';}
 .fa-search:before {content:'\e802'; }
 .fa-thumbs-o-up:before {content:'\e803';}
-.fa-left-open:before {content:'\e804';}
-.fa-right-open:before {content:'\e805';}
 .fa-facebook-square:before {content:'\e806';}
-.fa-google-plus-square:before {content:'\e807';}
 .fa-twitter-square:before {content:'\e808';}
+.fa-instagram:before {content:'\f16d';}
+.fa-linkedin-square:before {content:'\f30c';}
 .fa-caret-down:before {content:'\e809';}
 .fa-caret-up:before {content:'\e80a';}
 .fa-adjust:before { content: '\e80b'; }
@@ -572,6 +572,9 @@ h2 {
 .w3-panel,.w3-info {
   margin-left:-24px;
   margin-right:-24px;
+  padding-left:24px;
+  padding-right:24px;
+
 }
 
 }
@@ -1655,36 +1658,11 @@ attribute to the table:</p>
 </div>
 
 <div class="sidesection">
-  <h4>SHARE</h4>
+  <h4>LIKE US</h4>
   <div class="w3-text-grey sharethis">
-    <script>
-      <!--
-      try{
-      loc=location.pathname;
-      if (loc.toUpperCase().indexOf(".ASP")<0) loc=loc+"default.asp";
-      var ingr="Check this page:";
-      if (document.getElementById("main") && document.getElementById("main").getElementsByTagName) {
-        ingr=document.getElementById("main").getElementsByTagName("h1")[0].innerText;
-        if (ingr.indexOf("Quiz") > -1) {
-          ingr="Test your skills with a "+document.getElementById("main").getElementsByTagName("h1")[0].innerText+" from W3Schools:";
-        } else {
-          //ingr+=" - "+document.getElementById("main").getElementsByTagName("p")[0].innerText+"...";
-          ingr+=" - Learn more:";
-        }
-      }
-      txt='<a href="http://www.facebook.com/sharer.php?u=https://www.w3schools.com'+loc+'" target="_blank" title="Facebook"><span class="fa fa-facebook-square fa-2x"></span></a>';
-      //txt=txt+'<a href="https://twitter.com/home?status=Currently reading https://www.w3schools.com'+loc+'" target="_blank" title="Twitter"><span class="fa fa-twitter-square fa-2x"></span></a>';
-      txt=txt+'<a href="https://twitter.com/intent/tweet?url=https://www.w3schools.com'+loc+'&text='+encodeURI(ingr)+'" target="_blank" title="Twitter"><span class="fa fa-twitter-square fa-2x"></span></a>';
-      document.write(txt);
-      } catch(e) {}
-      //-->
-    </script>
-    <a href="javascript:void(0);" onclick="clickFBLike()" title="Like W3Schools on Facebook">
-      <span class="fa fa-thumbs-o-up fa-2x"></span>
-    </a>
-    <div id="fblikeframe" class="w3-modal">
-      <div class="w3-modal-content w3-padding-64 w3-animate-zoom" id="popupDIV"></div>
-    </div>
+    <a href="https://www.facebook.com/w3schoolscom/" target="_blank" title="Facebook"><span class="fa fa-facebook-square fa-2x"></span></a>
+    <a href="https://www.instagram.com/w3schools.com_official/" target="_blank" title="Instagram"><span class="fa fa-instagram fa-2x"></span></a>
+    <a href="https://www.linkedin.com/company/w3schools.com/" target="_blank" title="LinkedIn"><span class="fa fa-linkedin-square fa-2x"></span></a>
   </div>
 </div>
 

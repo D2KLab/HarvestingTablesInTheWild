@@ -16,5 +16,6 @@ COPY Pipfile Pipfile.lock ./
 RUN python -m pip install --upgrade pip
 RUN pip install pipenv
 RUN pipenv install --system --ignore-pipfile --dev
+RUN python -m spacy download en
 
 COPY . .

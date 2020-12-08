@@ -1,37 +1,37 @@
 import csv
 import os
-from functools import reduce
-from typing import Iterable, Dict, List
-import itertools
 import re
+import itertools
+from typing import Iterable, List
 
 from bs4 import BeautifulSoup
 from scrapy.http.response.text import TextResponse
 
 from core.parsing.exceptions import InvalidTableException
+from core.normalization import clean_unicode, clean_whitespace, get_n_most_common_terms
 
 
 MIN_BODY_ROWS = 2
 
-def clean_whitespace(text: str) -> str:
-    # remove tabs, newlines and other whitespace (also leading/trailing)
-    text = ' '.join(text.split())
-    return text
 
 def parse_inner_text_from_html(html: str) -> str:
     if not html:
         return ""
 
     bs = BeautifulSoup(html, features='lxml')
-    return clean_whitespace(bs.text)
+    cleaned_whitespace = clean_whitespace(bs.text)
+    return clean_unicode(cleaned_whitespace)
+
 
 def get_text_after(element) -> str:
     html = element.xpath('./following-sibling::*[1]').get()
     return parse_inner_text_from_html(html)
 
+
 def get_text_before(element) -> str:
     html = element.xpath('./preceding-sibling::*[1]').get()
     return parse_inner_text_from_html(html)
+
 
 def is_in_form(element) -> bool:
     """
@@ -52,38 +52,39 @@ def is_in_form(element) -> bool:
 
     return is_in_form(parent)
 
+
 def get_term_set(html) -> List[str]:
     """
     Returns the 100 most common terms (words) on the web page,
     sorted in descending order
     """
     if isinstance(html, str):
-        fields = html.split() # split into fields
+        fields = html.split()  # split into fields
     elif isinstance(html, TextResponse):
         fields = html.css('body *::text').getall()
     else:
-        raise TypeError('Type must by scrapy.TextResponse or str, got:  ' + str(type(html)))
+        raise TypeError(
+            'Type must by scrapy.TextResponse or str, got:  ' + str(type(html)))
 
+    unicode_cleaned_fields = list(map(clean_unicode, fields))
     # convert special characters into whitespace to use them as word boundaries
-    all_fields = [' '.join(re.split('[^a-zA-Z0-9]', f)) for f in fields]
+    all_fields = [' '.join(re.split('[^a-zA-Z0-9]', f))
+                  for f in unicode_cleaned_fields]
     # convert and reduce all whitespace characters
     cleaned_fields = map(clean_whitespace, all_fields)
     # split at word boundaries and flatten list
-    split_fields =  list(itertools.chain(*[
+    split_fields = list(itertools.chain(*[
         f.split()
         for f in cleaned_fields
     ]))
     # cast all non-empty and non-whitespace fields to lowercase
-    non_empty_fields = [f.lower() for f in split_fields if f and not f.isspace()]
-    # accumulate to calculate frequencies
-    term_freq = {}
-    for f in non_empty_fields:
-        term_freq[f] = term_freq.get(f, 0) + 1
+    non_empty_fields = [f.lower()
+                        for f in split_fields if f and not f.isspace()]
+    cleaned_fields = list(map(clean_whitespace, non_empty_fields))
+    cleaned_text = ' '.join(cleaned_fields)
 
-    sorted_terms = [term for term, freq in sorted(term_freq.items(), key=lambda item: item[1], reverse=True)]
+    return get_n_most_common_terms(cleaned_text, 100)
 
-    # return at most 100 items
-    return sorted_terms[0:100]
 
 def validate_body_cell_layout(rows: Iterable[List]):  # pylint: disable=useless-return
     """
@@ -93,7 +94,8 @@ def validate_body_cell_layout(rows: Iterable[List]):  # pylint: disable=useless-
     Raises InvalidTableException when a requirements is not satisfied
     """
     if len(rows) < MIN_BODY_ROWS:
-        raise InvalidTableException(f'Table only has {len(rows)} rows, min: {MIN_BODY_ROWS}')
+        raise InvalidTableException(
+            f'Table only has {len(rows)} rows, min: {MIN_BODY_ROWS}')
 
     row_cols = {}
     for row in rows:
@@ -102,36 +104,14 @@ def validate_body_cell_layout(rows: Iterable[List]):  # pylint: disable=useless-
     most_common_cols = max(row_cols, key=row_cols.get)
     max_cols = max(row_cols)
     if max_cols > most_common_cols:
-        raise InvalidTableException('Maximum number of columns exceed most common number of columns')
+        raise InvalidTableException(
+            'Maximum number of columns exceed most common number of columns')
 
     return None
 
+
 def get_title_from_text(response) -> str:
     return response.css('title::text').get() or ""
-
-def compose_normalized_table(headers: Iterable, rows: Iterable) -> Dict:
-    '''
-    Parameters:
-    headers: header row of the table
-    rows: a 2-dimensional list (matrix) that contains
-    the data rows for the given table. Eg. cell = rows[row_index][column_index]
-
-    Returns:
-    Table in object notation.
-    For example:
-    >>> compose_normalized_table(["header1","header2"],[[1,2],[3,4]])
-    {'header1': [1, 3], 'header2': [2, 4]}
-
-    '''
-    try:
-        normalized_table = reduce(lambda composition, next_header: {
-            **composition, next_header: []}, headers, {})
-        for row in rows:
-            for index, cell in enumerate(row):
-                normalized_table[headers[index]].append(cell)
-        return normalized_table
-    except IndexError as e:
-        raise InvalidTableException() from e
 
 
 def get_url_list_from_environment():

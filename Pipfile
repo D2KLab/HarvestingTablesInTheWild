@@ -17,6 +17,7 @@ beautifulsoup4 = "*"
 python-arango = "*"
 scrapy-kafka-export = "*"
 scrapy-crawl-once = "*"
+spacy = "*"
 
 [requires]
 python_version = "3.8"

@@ -93,21 +93,22 @@ class WikitableParser(TableParser):
             table=cls.normalize_table(table),
             title=cls.get_table_title(table),
             markup=table.get(),
-            header_position="FIRST_ROW", # TODO: hardcoded
+            header_position="FIRST_ROW",  # TODO: hardcoded
             headers=header_values,
-            table_type="RELATION", # TODO: hardcoded
+            table_type="RELATION",  # TODO: hardcoded
         )
 
 
 class WellFormattedTableParser(TableParser):
     @classmethod
     def normalize_table(cls, table):
-	# eliminate tables with "rowspan" or "colspan"
+        # eliminate tables with "rowspan" or "colspan"
         if table.css('td[colspan]').getall() \
            or table.css('th[colspan]').getall() \
            or table.css('td[rowspan]').getall() \
            or table.css('td[rowspan]').getall():
-            raise InvalidTableException('Tables with colspan / rowspan not supported')
+            raise InvalidTableException(
+                'Tables with colspan / rowspan not supported')
 
         # extract header
         header_values = cls.__get_headers_values(table)
@@ -128,7 +129,6 @@ class WellFormattedTableParser(TableParser):
         # basic sanity check for body, will raise on error
         utils.validate_body_cell_layout(relation)
 
-        # return utils.compose_normalized_table(header_values, body_rows)
         return relation
 
     @classmethod
@@ -144,8 +144,8 @@ class WellFormattedTableParser(TableParser):
             table=cls.normalize_table(table),
             title=cls.get_table_title(table),
             markup=table.get(),
-            header_position="FIRST_ROW", # TODO: hardcoded
-            table_type="RELATION", # TODO: hardcoded
+            header_position="FIRST_ROW",  # TODO: hardcoded
+            table_type="RELATION",  # TODO: hardcoded
             headers=cls.__get_headers_values(table),
         )
 
