@@ -96,6 +96,9 @@ class WikitableParser(TableParser):
             header_position="FIRST_ROW",  # TODO: hardcoded
             headers=header_values,
             table_type="RELATION",  # TODO: hardcoded
+            orientation="VERTICAL",  # TODO: hardcoded
+            nb_columns=0,  # TODO
+            nb_rows=0,  # TODO
         )
 
 
@@ -147,6 +150,9 @@ class WellFormattedTableParser(TableParser):
             header_position="FIRST_ROW",  # TODO: hardcoded
             table_type="RELATION",  # TODO: hardcoded
             headers=cls.__get_headers_values(table),
+            orientation="VERTICAL", # TODO: hardcoded
+            nb_columns=0, # TODO
+            nb_rows=0, # TODO
         )
 
 

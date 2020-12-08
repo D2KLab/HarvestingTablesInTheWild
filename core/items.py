@@ -18,6 +18,9 @@ class CoreTableItem:
     table_type: str
     markup: str
     headers: List[str]
+    orientation: str
+    nb_columns: int
+    nb_rows: int
 
 @dataclass
 class CoreDataItem: # pylint: disable=too-many-instance-attributes
@@ -49,6 +52,10 @@ class CoreDataItem: # pylint: disable=too-many-instance-attributes
     textAfterTable: str
     headers: List[str]
     timestamp: str
+    tableOrientation: str
+    language: str
+    nbColumns: int
+    nbRows: int
 
     # expose a dynamic getter for this item
     # required for kafka-exporter

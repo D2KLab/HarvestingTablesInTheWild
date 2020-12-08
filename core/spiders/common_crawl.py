@@ -31,6 +31,7 @@ class CommonCrawlTableParserSpider(scrapy.Spider):
         timestamp = datetime.now().isoformat()
         table_number = 0
         term_set = get_term_set(response)
+        language = "en" # TODO: implement detection function
 
         for table in parser.get_tables(response):
             table_number += 1
@@ -60,4 +61,8 @@ class CommonCrawlTableParserSpider(scrapy.Spider):
                 s3Link="", # TODO
                 recordOffset=0, # TODO
                 recordEndOffset=0, # TODO
+                tableOrientation=core_table.orientation,
+                language=language,
+                nbColumns=core_table.nb_columns,
+                nbRows=core_table.nb_rows,
             )
