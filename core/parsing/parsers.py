@@ -121,12 +121,16 @@ class WellFormattedTableParser(TableParser):
             # just drop them here
             raise InvalidTableException('No headers found in table')
 
+        def extract_rows_from_body(table):
+            for row in table.css('tr'):
+                cleaned_cells = [utils.parse_inner_text_from_html(x)
+                                 for x in row.css('td').getall()]
+                # only return non-empty rows
+                if cleaned_cells:
+                    yield cleaned_cells
+
         # extract body
-        body_rows = [
-            [utils.parse_inner_text_from_html(x)
-             for x in row.css('td').getall()]
-            for row in table.css('tr')
-        ]
+        body_rows = list(extract_rows_from_body(table))
 
         # combine header and body into one relation
         relation = [header_values] + body_rows

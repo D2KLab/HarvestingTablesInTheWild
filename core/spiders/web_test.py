@@ -19,7 +19,9 @@ def test_parse_w3_html_tables():
     for t in got:
         t.timestamp = 'FAKE'
 
-    assert got == expected_output
+    # test each item individually (improves readability of the diff)
+    for i, _ in enumerate(got):
+        assert got[i] == expected_output[i]
 
 def test_parse_wikipedia_nhl():
     url, html, expected_output = wiki_nhl()
@@ -33,4 +35,6 @@ def test_parse_wikipedia_nhl():
     for t in got:
         t.timestamp = 'FAKE'
 
-    assert got == expected_output
+    # test each item individually (improves readability of the diff)
+    for i, _ in enumerate(got):
+        assert got[i] == expected_output[i]
