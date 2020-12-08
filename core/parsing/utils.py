@@ -114,6 +114,19 @@ def get_title_from_text(response) -> str:
     return response.css('title::text').get() or ""
 
 
+def detect_language(response) -> str:
+    # default to english
+    lang = "en"
+
+    # check the HTML language attribute
+    if response:
+        lang = response.css('html').attrib.get('lang', lang)
+
+    lang = lang.split("-")[0] # strip country specific info, e.g. "en-US"
+
+    return lang
+
+
 def get_url_list_from_environment():
     url_string = os.environ.get('URL_STRING')
     url_file = os.environ.get('URL_FILE')

@@ -619,6 +619,7 @@ def wiki_nhl():
             s3Link="",
             recordOffset=0,
             recordEndOffset=0,
+            language="en",
         ),
     ]
 

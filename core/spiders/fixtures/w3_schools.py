@@ -168,6 +168,7 @@ def w3_schools():
             s3Link="",
             recordOffset=0,
             recordEndOffset=0,
+            language="en",
         ),
         CoreDataItem(
             relation=[
@@ -337,6 +338,7 @@ def w3_schools():
             s3Link="",
             recordOffset=0,
             recordEndOffset=0,
+            language="en",
         ),
     ]
 

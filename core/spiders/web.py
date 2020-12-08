@@ -4,7 +4,7 @@ import os
 
 import scrapy
 
-from core.parsing.utils import get_url_list_from_environment, get_title_from_text, get_term_set, get_text_before, get_text_after
+from core.parsing.utils import get_url_list_from_environment, get_title_from_text, get_term_set, get_text_before, get_text_after, detect_language
 from core.parsing.parsers import get_parser_from_url
 from core.items import CoreDataItem
 from core.crawling.strategy import CrawlingStrategy
@@ -35,7 +35,7 @@ class TableParserSpider(scrapy.Spider):
         timestamp = datetime.now().isoformat()
         table_number = 0
         term_set = get_term_set(response)
-        language = "en" # TODO: implement detection function
+        language = detect_language(response)
 
         for table in parser.get_tables(response):
             table_number += 1

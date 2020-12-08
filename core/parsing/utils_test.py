@@ -2,7 +2,7 @@ import pytest
 
 from scrapy.selector import Selector
 
-from core.parsing.utils import validate_body_cell_layout, get_term_set, is_in_form
+from core.parsing.utils import validate_body_cell_layout, get_term_set, is_in_form, detect_language
 from core.parsing.exceptions import InvalidTableException
 
 # pylint: disable=singleton-comparison
@@ -76,3 +76,16 @@ def test_is_in_form():
         text='<html><head><title>Hello</title></head><body><table>World</table></body><html>')
     sel = sel.css('table')
     assert is_in_form(sel) == False
+
+def test_detect_language():
+    sel = Selector(text='<html lang="fr"><body>Hello, world!</body></html>')
+    assert detect_language(sel) == "fr"
+
+    sel = Selector(text='<html><body>Hello, world!</body></html>')
+    assert detect_language(sel) == "en"
+
+    sel = Selector(text='<html lang="en-US"><body>Hello, world!</body></html>')
+    assert detect_language(sel) == "en"
+
+    sel = Selector(text='blablah')
+    assert detect_language(sel) == "en"
