@@ -12,7 +12,7 @@ def get_n_most_common_terms(text: str, n: int) -> List[str]:
     # Helpful reading:
     # https://spacy.io/usage/linguistic-features
     # https://universaldependencies.org/docs/u/pos/
-    pos_blacklist = ['ADP', 'SYM', 'DET', 'PUNCT', 'X']
+    pos_blacklist = ['ADP', 'SYM', 'DET', 'PRON', 'PUNCT', 'X']
     normalized_fields = [
         token.lemma_ for token in doc if not token.pos_ in pos_blacklist
     ]
