@@ -104,6 +104,27 @@
             "id": "http://jsonschema.net/timestamp",
             "format": "date-time",
             "description": "Timestamp in ISO 8601 format (without timezone) when the website was crawled."
+        },
+        "tableOrientation": {
+            "type":"string",
+            "enum": ["HORIZONTAL", "VERTICAL"],
+            "id": "http://jsonschema.net/tableOrientation",
+            "description": "Logical orientation of the table."
+        },
+        "language": {
+            "type":"string",
+            "id": "http://jsonschema.net/language",
+            "description": "Detected language of the entire HTML page (e.g. 'en')."
+        },
+        "nbColumns": {
+            "type":"integer",
+            "id": "http://jsonschema.net/nbColumns",
+            "description": "Number of columns in the table."
+        },
+        "nbRows": {
+            "type":"integer",
+            "id": "http://jsonschema.net/nbRows",
+            "description": "Number of rows in the table."
         }
     }
 }

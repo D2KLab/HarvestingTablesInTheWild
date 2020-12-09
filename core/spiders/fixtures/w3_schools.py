@@ -15,7 +15,6 @@ def w3_schools():
                     "Contact",
                     "Country"
                 ],
-                [],
                 [
                     "Alfreds Futterkiste",
                     "Maria Anders",
@@ -168,6 +167,10 @@ def w3_schools():
             s3Link="",
             recordOffset=0,
             recordEndOffset=0,
+            language="en",
+            nbColumns=3,
+            nbRows=7,
+            tableOrientation="VERTICAL",
         ),
         CoreDataItem(
             relation=[
@@ -175,7 +178,6 @@ def w3_schools():
                     "Tag",
                     "Description"
                 ],
-                [],
                 [
                     "<table>",
                     "Defines a table"
@@ -337,6 +339,10 @@ def w3_schools():
             s3Link="",
             recordOffset=0,
             recordEndOffset=0,
+            language="en",
+            nbColumns=2,
+            nbRows=11,
+            tableOrientation="VERTICAL",
         ),
     ]
 
