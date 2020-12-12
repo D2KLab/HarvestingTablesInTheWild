@@ -7,7 +7,7 @@ from collection import ArangoTableCollector
 
    
 rootLogger = logging.getLogger("ingestion_application")
-rootLogger.setLevel(logging.DEBUG)
+rootLogger.setLevel(logging.INFO)
 
 logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
 
