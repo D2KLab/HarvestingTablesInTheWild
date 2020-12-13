@@ -1,7 +1,6 @@
 import os
 import json
 import logging
-from uuid import uuid4
 from kafka import KafkaConsumer
 from collection import ArangoTableCollector
 
@@ -56,8 +55,7 @@ class Consumer:
         except Exception:
             rootLogger.error('Unable to parse the json incoming message with offset %s', message.offset)
             return
-            
-        payload['nonce'] = uuid4().hex
+
         try:
             # Insert into database
             self.database_collector.append(payload)
