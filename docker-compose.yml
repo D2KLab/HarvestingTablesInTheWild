@@ -40,6 +40,14 @@ services:
   core: &core
     build: .
 
+  database-ingestor:
+    <<: *core
+    environment: 
+      KAFKA_BOOTSTRAP_SERVERS: 'kafka:9092'
+      KAFKA_TOPIC: 'tablecollector'
+      ARANGO_HOST: http://arangodb:8529
+    command: ['python', 'analytics/kafka_consumer.py']
+
   spider:
     <<: *core
     environment:

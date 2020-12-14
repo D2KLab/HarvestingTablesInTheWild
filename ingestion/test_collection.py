@@ -1,5 +1,5 @@
 from uuid import uuid4
-from analytics.collection import ArangoTableCollector
+from ingestion.collection import ArangoTableCollector
 
 
 def test_arango_collector_append():

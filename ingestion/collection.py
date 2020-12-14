@@ -3,7 +3,6 @@ import json
 from abc import ABC, abstractmethod
 from arango import ArangoClient
 
-
 class TableCollector(ABC):
     '''
     Database system agnostic Abstract Base Class that describes methods
@@ -26,10 +25,15 @@ class ArangoTableCollector(TableCollector):
         raw_credentials = os.environ.get('ARANGODB_CREDENTIALS', '{}')
         credentials = json.loads(raw_credentials)
 
-        self.client = ArangoClient(hosts=arango_host)
-        self.db = self.client.db(
+        client = ArangoClient(hosts=arango_host)
+        self.db = client.db(
             ArangoTableCollector.__DATABASE, **credentials)
 
+        if self.db.has_collection(ArangoTableCollector.__COLLECTION):
+            self.tables = self.db.collection(ArangoTableCollector.__COLLECTION)
+        else:
+            self.tables = self.db.create_collection(ArangoTableCollector.__COLLECTION)
+
+
     def append(self, data):
-        tables = self.db.create_collection(ArangoTableCollector.__COLLECTION)
-        tables.insert(data)
+        self.tables.insert(data)
