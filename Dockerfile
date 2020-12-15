@@ -4,7 +4,8 @@ WORKDIR /srv/app
 
 RUN set -ex; \
     apt update && apt install -y --no-install-recommends \
-    sqlite3-dev \
+    libsqlite3-dev \
+    sqlite3 \
     nano \
     kafkacat \
     \
