@@ -1,0 +1,3 @@
+# do not count test files when detecting language
+# https://github.com/github/linguist#overrides
+core/spiders/fixtures/* linguist-vendored
