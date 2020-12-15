@@ -39,6 +39,7 @@ services:
 
   core: &core
     build: .
+    stop_grace_period: 10m
 
   database-ingestor:
     <<: *core
@@ -56,7 +57,9 @@ services:
       KAFKA_EXPORT: "true"
       CRAWL_ONCE: "true"
       LOG_LEVEL: "INFO"
-    command: ["scrapy", "crawl", "web"]
+    command: ["scrapy", "crawl", "web", "-s", "JOBDIR=.scrapy/crawls"]
+    volumes:
+      - spider_data:/srv/app/.scrapy
 
   cc-spider:
     <<: *core
@@ -65,7 +68,9 @@ services:
       KAFKA_EXPORT: "true"
       CRAWL_ONCE: "true"
       LOG_LEVEL: "INFO"
-    command: ["scrapy", "crawl", "common_crawl_table_parser"]
+    command: ["scrapy", "crawl", "common_crawl_table_parser", "-s", "JOBDIR=.scrapy/crawls"]
+    volumes:
+      - cc-spider_data:/srv/app/.scrapy/
 
   test:
     <<: *core
@@ -87,3 +92,5 @@ services:
 
 volumes:
   arangodb_data:
+  spider_data:
+  cc-spider_data:

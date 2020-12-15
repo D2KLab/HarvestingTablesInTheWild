@@ -60,6 +60,24 @@ The crawling strategy can be found in `core/crawling/strategy`.
 To avoid visiting the same URL multiple times, set the environment variable `CRAWL_ONCE=true` (this is the default inside the container).
 The database with the visited URLs is kept in `.scrapy/crawl_once/web.sqlite`.
 
+#### Stopping and resuming crawls
+
+To support stopping and later resuming crawls, Scrapy is storing some state in the JOBDIR (.scrapy/crawls).
+For the state to be persisted properly, Scrapy needs to be shut down "gracefully" (i.e. `SIGTERM` instead of `SIGKILL`).
+However, after receiving `SIGTERM` Scrapy will still finish all running requests before storing the state to disk.
+Thus, it needs to have enough time to do this (and not receive `SIGTERM`, which will immediately abort but not persist state).
+*This process can take SEVERAL minutes*, because we are crawling with very high concurrency.
+
+To reset the state of the spider, run the following commands:
+```
+# with docker-compose
+docker-compose stop spider
+docker-compose rm # deletes stopped containers
+docker volume rm harvestingtablesinthewild_spider_data
+# or locally:
+rm -r .scrapy/crawls .scrapy/crawl_once
+```
+
 ### Kafka
 
 The export of scraped items to Kafka can be enabled by setting the environment variable `KAFKA_EXPORT=true`.

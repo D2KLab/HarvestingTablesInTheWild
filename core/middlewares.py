@@ -6,7 +6,7 @@
 
 from scrapy import signals
 from scrapy.exceptions import IgnoreRequest
-from scrapy.http import HtmlResponse
+from scrapy.http import HtmlResponse, TextResponse
 
 from core.searching.common_crawl_search import CommonCrawlSearch
 from core.spiders.common_crawl import CommonCrawlTableParserSpider
@@ -109,6 +109,11 @@ class CoreDownloaderMiddleware:
         # - return a Response object
         # - return a Request object
         # - or raise IgnoreRequest
+
+        # Do not process binary responses (images, videos etc.)
+        if not isinstance(response, TextResponse):
+            raise IgnoreRequest()
+
         return response
 
     def process_exception(self, request, exception, spider):
