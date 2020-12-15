@@ -17,7 +17,7 @@ NEWSPIDER_MODULE = 'core.spiders'
 LOG_LEVEL = os.environ.get('LOG_LEVEL', 'ERROR')
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-# USER_AGENT = 'core (+http://www.yourdomain.com)'
+USER_AGENT = 'HTW (https://ds.eurecom.fr)'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
