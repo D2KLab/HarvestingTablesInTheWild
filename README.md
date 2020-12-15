@@ -111,6 +111,26 @@ kafkacat -b kafka:9092 -t tablecollector -P
 (type and hit enter)
 ```
 
+### ArangoDB
+
+Bring up the database:
+```
+docker-compose up -d arangodb
+```
+
+Connect with a shell:
+```
+docker exec -it htw_arangodb_1 arangosh
+(empty password)
+```
+
+Run a basic AQL query:
+```
+db._query({"query": "FOR table IN parsed_tables RETURN [table.url, table.tableNum]"}).toArray()
+```
+
+Arango Shell Cheatsheet: https://gist.github.com/jperocho/893a52748a27349a99452e78a6565da6
+
 ## Monitoring/Logging
 
 ### Setup
