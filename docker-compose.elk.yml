@@ -8,15 +8,15 @@ services:
         ELK_VERSION: 7.10.0
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
-    ports:
-      - "9200:9200"
-      - "9300:9300"
+    # ports:
+    #   - "9200:9200"
+    #   - "9300:9300"
+    env_file: elasticsearch.env
     environment:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
       # Use single node discovery in order to disable production mode and avoid bootstrap checks.
       # see: https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
       discovery.type: single-node
-      ELASTIC_PASSWORD: secure-elastic-password
     networks:
       - elk
 
@@ -25,11 +25,12 @@ services:
       context: logstash/
       args:
         ELK_VERSION: 7.10.0
-    ports:
-      - "5044:5044"
-      - "5000:5000/tcp"
-      - "5000:5000/udp"
-      - "9600:9600"
+    # ports:
+    #   - "5044:5044"
+    #   - "5000:5000/tcp"
+    #   - "5000:5000/udp"
+    #   - "9600:9600"
+    env_file: elasticsearch.env
     environment:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
     networks:
@@ -44,6 +45,7 @@ services:
         ELK_VERSION: 7.10.0
     ports:
       - "5601:5601"
+    env_file: elasticsearch.env
     networks:
       - elk
     depends_on:
