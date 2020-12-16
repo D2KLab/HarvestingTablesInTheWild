@@ -40,6 +40,8 @@ services:
   core: &core
     build: .
     stop_grace_period: 10m
+    labels:
+      com.htw.export-logs: "true"
 
   database-ingestor:
     <<: *core
