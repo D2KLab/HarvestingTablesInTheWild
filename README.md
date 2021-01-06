@@ -118,10 +118,12 @@ Bring up the database:
 docker-compose up -d arangodb
 ```
 
+The `ARANGO_ROOT_PASSWORD` is stored in the `.env` file.
+
 Connect with a shell:
 ```
 docker exec -it htw_arangodb_1 arangosh
-(empty password)
+(enter password)
 ```
 
 Run a basic AQL query:

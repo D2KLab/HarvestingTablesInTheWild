@@ -2,13 +2,12 @@ version: "3.3"
 services:
   arangodb:
     image: arangodb:3.7.3
-    # Uncomment to use web interface in development
-    # ports:
-    #   - 8529:8529
+    ports:
+      - 8529:8529
     volumes:
       - arangodb_data:/var/lib/arango
     environment:
-      ARANGO_NO_AUTH: 1
+      ARANGO_ROOT_PASSWORD: "${ARANGO_ROOT_PASSWORD}"
 
   zookeeper:
     image: wurstmeister/zookeeper
@@ -45,10 +44,11 @@ services:
 
   database-ingestor:
     <<: *core
-    environment: 
+    environment:
       KAFKA_BOOTSTRAP_SERVERS: 'kafka:9092'
       KAFKA_TOPIC: 'tablecollector'
       ARANGO_HOST: http://arangodb:8529
+      ARANGO_CREDENTIALS: '{"username":"root","password":"${ARANGO_ROOT_PASSWORD}"}'
     command: ['python', 'ingestion/kafka_consumer.py']
 
   spider:
