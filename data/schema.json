@@ -125,6 +125,11 @@
             "type":"integer",
             "id": "http://jsonschema.net/nbRows",
             "description": "Number of rows in the table."
+        },
+        "referrer": {
+            "type": "string",
+            "id": "http://jsonschema.net/referrer",
+            "description": "URL of the page that linked to the page containing the table."
         }
     }
 }

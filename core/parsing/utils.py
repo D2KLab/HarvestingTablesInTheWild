@@ -145,3 +145,12 @@ def get_url_list_from_environment():
     if len(urls) == 0:
         raise Exception('No URLs found from provided resource')
     return urls
+
+def get_referrer(response) -> str:
+    try:
+        meta = response.request.meta
+    except AttributeError:
+        # response is not tied to any request, use an empty meta dict
+        meta = {}
+
+    return meta.get('referrer', '')

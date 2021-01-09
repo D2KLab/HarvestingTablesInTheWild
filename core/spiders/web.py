@@ -4,7 +4,7 @@ import os
 
 import scrapy
 
-from core.parsing.utils import get_url_list_from_environment, get_title_from_text, get_term_set, get_text_before, get_text_after, detect_language
+from core.parsing.utils import get_url_list_from_environment, get_title_from_text, get_term_set, get_text_before, get_text_after, detect_language, get_referrer
 from core.parsing.parsers import get_parser_from_url
 from core.items import CoreDataItem
 from core.crawling.strategy import CrawlingStrategy
@@ -24,7 +24,11 @@ class TableParserSpider(scrapy.Spider):
         for url in self.urls:
             yield scrapy.Request(url=url,
                                  callback=self.parse,
-                                 meta={'crawl_once': True},
+                                 meta={
+                                     'crawl_once': True,
+                                     # pseudo starting point
+                                     'referrer': 'http://localhost',
+                                 },
                                  )
 
     def parse(self, response, **kwargs):
@@ -36,6 +40,9 @@ class TableParserSpider(scrapy.Spider):
         table_number = 0
         term_set = get_term_set(response)
         language = detect_language(response)
+        referrer = get_referrer(response)
+        if not referrer:
+            self.logger.warning("Request to %s has no referrer", response.url)
 
         for table in parser.get_tables(response):
             table_number += 1
@@ -69,8 +76,17 @@ class TableParserSpider(scrapy.Spider):
                 language=language,
                 nbColumns=core_table.nb_columns,
                 nbRows=core_table.nb_rows,
+                referrer=referrer,
             )
 
         # also crawl all links in the webpage, according to crawl strategy
         links = CrawlingStrategy.get_links_to_follow(response.url, response.css('body'))
-        yield from response.follow_all(links, callback=self.parse)
+        yield from response.follow_all(
+            links,
+            callback=self.parse,
+            meta={
+                'crawl_once': True,
+                # pass on current URL as referrer for the next request
+                'referrer': response.url,
+            },
+        )

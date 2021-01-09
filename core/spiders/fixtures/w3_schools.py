@@ -171,6 +171,7 @@ def w3_schools():
             nbColumns=3,
             nbRows=7,
             tableOrientation="VERTICAL",
+            referrer='',
         ),
         CoreDataItem(
             relation=[
@@ -343,6 +344,7 @@ def w3_schools():
             nbColumns=2,
             nbRows=11,
             tableOrientation="VERTICAL",
+            referrer='',
         ),
     ]
 

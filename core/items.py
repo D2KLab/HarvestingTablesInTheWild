@@ -56,6 +56,7 @@ class CoreDataItem: # pylint: disable=too-many-instance-attributes
     language: str
     nbColumns: int
     nbRows: int
+    referrer: str
 
     # expose a dynamic getter for this item
     # required for kafka-exporter

@@ -623,6 +623,7 @@ def wiki_nhl():
             nbRows=40,
             nbColumns=10,
             tableOrientation="VERTICAL",
+            referrer='',
         ),
     ]
 
