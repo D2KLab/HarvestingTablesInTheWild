@@ -43,6 +43,8 @@ class CrawlingStrategy:
 
     blacklist_regexes = [re.compile(i) for i in [
         r'^(?!.*(en)).*\.wikipedia\.org', # blacklist everything except en.wikipedia.org
+        r'^(?!.*(en)).*\.wiki.*\.org', # blacklist everything except english wikis
+        r'^.*\.m\..*', # blacklist mobile pages
         r'example\.org', # for testing purposes, no tables here anyway
     ]]
 
