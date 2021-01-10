@@ -22,7 +22,7 @@ class ArangoTableCollector(TableCollector):
         if not arango_host:
             raise Exception('ARANGO_HOST not defined')
 
-        raw_credentials = os.environ.get('ARANGODB_CREDENTIALS', '{}')
+        raw_credentials = os.environ.get('ARANGO_CREDENTIALS', '{}')
         credentials = json.loads(raw_credentials)
 
         client = ArangoClient(hosts=arango_host)
