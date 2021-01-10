@@ -1,0 +1,23 @@
+name: Project Report
+
+on:
+  push:
+    paths:
+      # only run for changes in report/ directory
+      - 'report/**'
+
+jobs:
+  test:
+    name: Render Report
+    runs-on: ubuntu-latest
+    container:
+      image: docker://aergus/latex:latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v2
+      - name: Render Project Report with pandoc
+        run: 'cd report && ./render.sh'
+      - uses: actions/upload-artifact@v2
+        with:
+          name: report.pdf
+          path: report/report.pdf

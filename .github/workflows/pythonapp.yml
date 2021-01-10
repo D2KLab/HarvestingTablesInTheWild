@@ -1,6 +1,10 @@
 name: Python application
 
-on: push
+on:
+  push:
+    paths:
+      # ignore report/ path
+      - '!report/**'
 
 jobs:
   test:
