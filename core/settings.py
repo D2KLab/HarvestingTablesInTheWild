@@ -26,12 +26,12 @@ ROBOTSTXT_OBEY = True
 SCHEDULER_PRIORITY_QUEUE = 'scrapy.pqueues.DownloaderAwarePriorityQueue'
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 100
+CONCURRENT_REQUESTS = 64
 
 # Configure a delay for requests for the same website (default: 0)
-DOWNLOAD_DELAY = 1
-DOWNLOAD_TIMEOUT = 10
-CONCURRENT_REQUESTS_PER_DOMAIN = 16
+DOWNLOAD_DELAY = 2
+DOWNLOAD_TIMEOUT = 16
+CONCURRENT_REQUESTS_PER_DOMAIN = 10
 
 # Disable cookies (enabled by default)
 COOKIES_ENABLED = False
