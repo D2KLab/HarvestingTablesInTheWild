@@ -3,6 +3,11 @@ import json
 
 from arango import ArangoClient
 
+# Useful References for ArangoDB graphs:
+# https://python-driver-for-arangodb.readthedocs.io/en/master/graph.html#edge-collections
+# https://python-driver-for-arangodb.readthedocs.io/en/master/specs.html#standardcollection
+# https://stackoverflow.com/a/23708645
+
 class ArangoTableProcessor():
     __TABLE_COLLECTION = 'parsed_tables'
     __PAGE_COLLECTION = 'visited_pages'
