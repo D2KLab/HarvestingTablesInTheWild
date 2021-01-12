@@ -21,7 +21,7 @@ class ArangoTableProcessor():
         arango_host = os.environ.get('ARANGO_HOST', 'http://localhost:8529')
         if not arango_host:
             raise Exception('ARANGO_HOST not defined')
-        raw_credentials = os.environ.get('ARANGODB_CREDENTIALS', '{}')
+        raw_credentials = os.environ.get('ARANGO_CREDENTIALS', '{}')
         credentials = json.loads(raw_credentials)
 
         # connect to database
