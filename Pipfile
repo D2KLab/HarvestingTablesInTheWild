@@ -19,6 +19,7 @@ scrapy-kafka-export = "*"
 scrapy-crawl-once = "*"
 spacy = "*"
 kafka-python = "*"
+requests = "*"
 
 [requires]
 python_version = "3.8"
