@@ -59,8 +59,8 @@ This section will cover our implementation and the milestones we have completed 
 
 ### Basic crawling and table extraction
 
-The first significant milestone we reached (2020-11-02) was the basic crawling of web pages (i.e. downloading the HTML contents) and extracting the HTML tables.
-The first version would simply take a list of URLs, download and parse these pages and finally store the results in a JSON file.
+The first significant milestone we reached was the basic crawling of web pages (i.e. downloading the HTML contents) and extracting the HTML tables.
+At this stage, our tool would simply take a list of URLs, download and parse these pages and finally store the results in a JSON file.
 
 We opted for the Python programming language for our implementation because it very well suited for the task of crawling web pages, its flexibility and loose typing make it very convenient to deal with arbitrary and unformatted data and finally it has many excellent open source libraries available.
 For the crawling itself, we decided to use the Scrapy framework \cite{scrapy} **TODO** *why?*
@@ -70,7 +70,7 @@ For the crawling itself, we decided to use the Scrapy framework \cite{scrapy} **
 The next big step was implementing advanced table extraction and parsing algorithms.
 In particular, we decided to use two different algorithms for parsing tables on Wikipedia pages and the rest of the web pages.
 This decision was made because Wikipedia pages follow a much stricter format than the average table on the web.
-**TODO** @eelisk *Expand on the wikipedia algorithm*
+**TODO** @eelisk *Expand on the Wikipedia algorithm*
 
 Based on the literature we studied previously, we identified and implemented several important criteria which allow us to collect tables with meaningful content:
 
@@ -94,8 +94,23 @@ The unit tests are testing small pieces of separate functionality (such as text 
 ### Data format
 
 By now, we were collecting many different pieces of information and had to come up with data format to store this data in.
+We evaluated several data formats that have already been used in other projects.
+Initially, we also considered using a storage format suitable for very large datasets, in particular Apache Avro, but decided against due to the difficulty of dealing with binary formats.
+Furthermore, since we were planning to build a pipeline for table collection, a plaintext format that is easily serializable seemed more suitable for our purposes.
+Despite these requirements, we still had several contenders:
 
-refer to https://github.com/D2KLab/HarvestingTablesInTheWild/issues/5
+* TableNet (JSON based) [3]
+* DWTC Dresden Web Table Corpus (JSON based) [4]
+* WTC Web Table Corpora (JSON based) [5]
+* W3C CSV [6]
+
+After comparing these options, we decided that the W3C CSV format is not suitable, because information about a single table is stored in multiple CSV files (one file for the table content, additional files for the metadata).
+This would increase the complexity of our data pipeline significantly.
+
+Since the WTC format is based on the DWTC format, the DWTC seemed to be a widely used and proven data format.
+We also considered the attributes it contained relevant to our usecase, but at the same time decided to extend it with additional metadata and also incorporate some fields from the TableNet format.
+
+To document our final data format and make sure our own application adheres to it, we created a JSON schema definition (Appendix ABC).
 
 ### Common Crawl
 
@@ -129,3 +144,11 @@ How the work we have done so far can be continued or improved.
 [1] Hassan, Md Imrul, Hai L. Vu, and Taka Sakurai. *"Performance analysis of the IEEE 802.11 MAC protocol for DSRC safety applications."* IEEE Transactions on vehicular technology 60.8 (2011): 3882-3896.
 
 [2] https://www.worldwidewebsize.com/
+
+[3] https://github.com/bfetahu/wiki_tables/tree/master/data
+
+[4] https://wwwdb.inf.tu-dresden.de/misc/dwtc/schema.json
+
+[5] http://webdatacommons.org/webtables/#results-2015
+
+[6] https://www.w3.org/TR/tabular-data-primer/
