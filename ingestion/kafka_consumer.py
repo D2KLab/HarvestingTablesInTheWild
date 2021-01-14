@@ -1,10 +1,11 @@
 import os
 import json
 import logging
+from postprocessing.annotation import TableAnnotationAPIClient
+from ingestion.collection import ArangoTableCollector
 from kafka import KafkaConsumer
-from collection import ArangoTableCollector
 
-   
+
 rootLogger = logging.getLogger("ingestion_application")
 rootLogger.setLevel(logging.INFO)
 
@@ -36,6 +37,7 @@ class Consumer:
         self.consumer = KafkaConsumer(bootstrap_servers = bootstrap_servers,
                         auto_offset_reset = self.__OFFSET_LISTENING_POLICY,
                         max_poll_records = self.__MAX_POLL_RECORDS)
+        self.annotation_client = TableAnnotationAPIClient()
 
         rootLogger.info('Connected to Kafka brokers at %s', bootstrap_servers)
 
@@ -49,12 +51,19 @@ class Consumer:
         for message in self.consumer:
             self.__validate_and_insert(message)
 
+    # pylint: disable=broad-except
     def __validate_and_insert(self, message):
         try:
             payload = json.loads(message.value)
         except Exception:
             rootLogger.error('Unable to parse the json incoming message with offset %s', message.offset)
             return
+
+        try:
+            preprocess_additions = self.annotation_client.preprocess(payload)
+            payload['preprocessing'] = preprocess_additions
+        except Exception as e:
+            rootLogger.exception('Failed to preprocess table: %s', e)
 
         try:
             # Insert into database
