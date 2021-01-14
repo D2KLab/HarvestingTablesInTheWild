@@ -61,6 +61,11 @@ class Consumer:
 
         try:
             preprocess_additions = self.annotation_client.preprocess(payload)
+
+            # check if preprocessing was executed synchronously
+            if 'output' in preprocess_additions:
+                preprocess_additions = preprocess_additions['output']
+
             payload['preprocessing'] = preprocess_additions
         except Exception as e:
             rootLogger.exception('Failed to preprocess table: %s', e)
