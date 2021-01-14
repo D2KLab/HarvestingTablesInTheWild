@@ -51,6 +51,9 @@ System Design:
 * Kafka Message Queue
 * ArangoDB Database
 
+<!-- TODO: What was the motivation for using ArangoDB (while the Kibana stack is generally associated with ElasticSearch)? -->
+
+
 ## Implementation and Milestones
 
 After familiarizing ourselves with the topic and having studied the relevant literature, we began designing and implementing our data processing pipeline.
@@ -64,6 +67,8 @@ At this stage, our tool would simply take a list of URLs, download and parse the
 
 We opted for the Python programming language for our implementation because it very well suited for the task of crawling web pages, its flexibility and loose typing make it very convenient to deal with arbitrary and unformatted data and finally it has many excellent open source libraries available.
 For the crawling itself, we decided to use the Scrapy framework \cite{scrapy} **TODO** *why?*
+
+<!-- TODO: What library, if any, did you use to actually perform the table extraction (or was it coded from scratch)? Does Scrapy only manage the crawling part?  -->
 
 ### Advanced table parsing
 
@@ -93,6 +98,8 @@ The unit tests are testing small pieces of separate functionality (such as text 
 
 ### Data format
 
+<!-- DONE: What was the design decision for the JSON metadata format for representing the table metadata and content? Clearly, you have been influenced by the WDC format, http://webdatacommons.org/webtables/2015/downloadInstructions.html ... what else?  -->
+
 By now, we were collecting many different pieces of information and had to come up with data format to store this data in.
 We evaluated several data formats that have already been used in other projects.
 Initially, we also considered using a storage format suitable for very large datasets, in particular Apache Avro, but decided against due to the difficulty of dealing with binary formats.
@@ -120,6 +127,8 @@ In addition to crawling pages from the world wide web, we also wanted to explore
 ### Crawling strategy
 
 ### First crawl
+
+<!-- TODO: When you go over a page which has been previously crawled, do you have mechanism to detect changes on the page or not?  -->
 
 ### Visualization
 
