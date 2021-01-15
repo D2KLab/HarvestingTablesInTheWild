@@ -183,7 +183,7 @@ class ArangoTableProcessor:
                     self.db.update_document({'_id': document_id, 'preprocessing': task_result})
                     print("UPDATED: table (%s) preprocessing data" % document_id)
                 else:
-                    print("Failed to update document", task_id, task_result)
+                    print("WARNING: Failed to update document", task_id, task_result)
             else:
                 print('WARNING: no updates made to table %s (%s): %s' % (document_id, task_id, task_status))
 

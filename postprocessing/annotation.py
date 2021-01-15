@@ -53,6 +53,8 @@ class TableAnnotationAPIClient(OrangeAPIClient):
     API Client:
     Orange Table Annotation
     Semantic Annotation Toolkit for Tabular Data
+
+    NOTE: This API is in beta and may not work as intended
     '''
 
     def __init__(self):
