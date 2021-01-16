@@ -166,16 +166,18 @@ class ArangoTableProcessor:
             print("Processed %d out of %d webpages" % (processed, len(all_pages)))
 
     def backfill_preprocess_results(self):
-        all_tasks = []
+        # Collect all pending tasks
+        pending_tasks = []
         cursor = self.db.aql.execute(
             f"FOR table IN {self.__TABLE_COLLECTION} RETURN [table.preprocessing, table._id]",
         )
         for preprocess, document_id in cursor:
             if 'task_id' in preprocess:
-                all_tasks.append([preprocess['task_id'], document_id])
+                pending_tasks.append([preprocess['task_id'], document_id])
         
+        # Try to backfill all the missing preprocessing results
         client = TableAnnotationAPIClient()
-        for task_id, document_id in all_tasks:
+        for task_id, document_id in pending_tasks:
             task_status = client.get_preprocess_task_status(task_id)
             if task_status.get('Task status') == 'SUCCESS':
                 task_result = client.get_preprocess_task_result(task_id)
@@ -183,7 +185,7 @@ class ArangoTableProcessor:
                     self.db.update_document({'_id': document_id, 'preprocessing': task_result})
                     print("UPDATED: table (%s) preprocessing data" % document_id)
                 else:
-                    print("WARNING: Failed to update document", task_id, task_result)
+                    print("ERROR: Failed to update document", task_id, task_result)
             else:
                 print('WARNING: no updates made to table %s (%s): %s' % (document_id, task_id, task_status))
 
