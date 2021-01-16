@@ -19,7 +19,7 @@ fontsize: 11pt
 
 The world wide web is full of information. Already the number of web pages indexed by search engines is more than 5 billion [2].
 The information on these web pages is mostly aimed at solely human consumption, which at the same time makes it very difficult to be automatically processed by machines.
-Plain text data (such as regular HTML websites) are still comprehendable by machines, but with complex layouts and designs it becomes increasingly difficult for a machine to access this data in a meaningful way - in the end, we want to turn data into information.
+While plain text data (such as regular HTML websites) are still comprehendible by machines, with complex layouts and designs it becomes increasingly difficult for a machine to access this data in a meaningful way - in the end, we want to turn data into information.
 
 One such example are HTML tables. From human perspective they are intuitively easy to understand (just by looking at them), but for a machine they are difficult to assess because of the graphical nature of them: all the little visual details (such as delimiters and orientation) matter a lot.
 At the same time, the tables themselves usually just contain the data (e.g. statistics), while the surrounding text (headers, captions and description) gives this data meaning.
@@ -51,14 +51,23 @@ In this section we will give an overview of background literature and related wo
 This section gives a high-level overview of the table collection pipeline we have designed and built.
 Specific implementation details will be outlined in Section 3.
 
-**TODO** @rohit *Produce an updated system architecture figure*
+![System architecture](images/archi.png)
+
+
+Language Used: Python 3
 
 System Design:
 
-* Python 3
 * Scrapy
 * Kafka Message Queue
 * ArangoDB Database
+
+Service Components:
+
+* Scrapy Spiders such as Common crawl Spider and web spider
+* Ingestion Service
+* PostProcessing services such as table annotation service
+
 
 <!-- DONE: What was the motivation for using ArangoDB (while the Kibana stack is generally associated with ElasticSearch)? -->
 
@@ -66,6 +75,18 @@ Finally, we decided use ArangoDB as our storage backend.
 Unlike other NoSQL databases, ArangoDB natively supports multiple data models: document store, graph store and full-text search.
 This means it combines the capabilities of databases such as MongoDB, Neo4j and Elasticsearch all into one database.
 This is excellent for quick prototyping, because it allows us to focus on the data collection and ingestion first, and later we can explore various ways of accessing and analyzing the data. https://www.arangodb.com/resources/white-paper/multi-model-database/
+
+## Monitoring Infrastructure
+In addition to the web table harvesting system, we also deployed a parallel monitoring infrastructure for a proper log monitoring and visualization. This infrastructure was based on the popular ELK stack i.e. Elasticsearch, Logstash, and Kibana. ELK stack is completely open-source, popular and can analyze and visualize logs from multiple sources in real time.
+
+![Monitoring architecture](images/elk.png)
+
+Monitoring infrastructure components:
+* Logspout for docker logs redirection
+* LogStash for log aggregation
+* Elasticsearch for indexing and storage
+* Kibana for analytics and visualization
+
 
 # Implementation and Milestones
 
@@ -127,7 +148,7 @@ After comparing these options, we decided that the W3C CSV format is not suitabl
 This would increase the complexity of our data pipeline significantly.
 
 Since the WTC format is based on the DWTC format, the DWTC seemed to be a widely used and proven data format.
-We also considered the attributes it contained relevant to our usecase, but at the same time decided to extend it with additional metadata and also incorporate some fields from the TableNet format.
+We also considered the attributes it contained relevant to our use case, but at the same time decided to extend it with additional metadata and also incorporate some fields from the TableNet format.
 
 To document our final data format and make sure our own application adheres to it, we created a JSON schema definition (Appendix ABC).
 
@@ -177,7 +198,7 @@ Additionally, in this example we used a `type` key to distinguish different type
 In a post-processing step we establish the edges between all the relevant documents (tables and pages) we have previously collected.
 Then, we can explore this graph programmatically with the Arango Query Language (AQL) or visually through the Arango Dashboard.
 
-![Simple Graph in Arango Dashboard](simple-graph.png)
+![Simple Graph in Arango Dashboard](images/simple-graph.png)
 
 In Figure 1, the violet circles represent page vertices (a webpage that has been crawled), while the black vertices represent table vertices (a table that has been collected).
 The virtual start node is "HTW Start" (where the crawl started), but this can adjusted through the UI to start traversing the graph.
