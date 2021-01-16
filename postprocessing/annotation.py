@@ -35,10 +35,16 @@ class OrangeAPIClient:
             raise Exception('Failed to get access credentials: ',
                             self.access_credentials)
 
+        self.authorization = f'{self.access_credentials["token_type"]} {self.access_credentials["access_token"]}'
+
     def post_json(self, path: str, data: dict) -> dict:
-        authorization = f'{self.access_credentials["token_type"]} {self.access_credentials["access_token"]}'
         response = requests.post(f"{self.__API_BASE_URL}{path}", json=data, headers={
-                                 'Authorization': authorization})
+                                 'Authorization': self.authorization})
+        return response.json()
+
+    def get_json(self, path: str) -> dict:
+        response = requests.get(f"{self.__API_BASE_URL}{path}", headers={
+                                'Authorization': self.authorization, 'Accept': 'application/json'})
         return response.json()
 
 
@@ -47,6 +53,8 @@ class TableAnnotationAPIClient(OrangeAPIClient):
     API Client:
     Orange Table Annotation
     Semantic Annotation Toolkit for Tabular Data
+
+    NOTE: This API is in beta and may not work as intended
     '''
 
     def __init__(self):
@@ -60,12 +68,18 @@ class TableAnnotationAPIClient(OrangeAPIClient):
 
         super().__init__(client_id, client_secret)
 
-    def preprocessing(self, data):
+    def preprocess(self, data):
         prepared_data = self.prepare_core_data_item(data)
         return self.post_json("/table_annotation/beta/preprocessing", prepared_data)
 
+    def get_preprocess_task_status(self, task_id):
+        return self.get_json(f"/table_annotation/beta/preprocessing/{task_id}")
+
+    def get_preprocess_task_result(self, task_id):
+        return self.get_json(f"/table_annotation/beta/preprocessing/{task_id}/result")
+
     # pylint: disable=no-self-use
-    def annotation(self):
+    def annotate(self):
         raise Exception(
             'Check updates from: https://developer.orange.com/apis/table-annotation/getting-started')
 

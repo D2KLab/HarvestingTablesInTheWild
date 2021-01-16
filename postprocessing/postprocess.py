@@ -2,13 +2,14 @@ import os
 import json
 
 from arango import ArangoClient
+from annotation import TableAnnotationAPIClient
 
 # Useful References for ArangoDB graphs:
 # https://python-driver-for-arangodb.readthedocs.io/en/master/graph.html#edge-collections
 # https://python-driver-for-arangodb.readthedocs.io/en/master/specs.html#standardcollection
 # https://stackoverflow.com/a/23708645
 
-class ArangoTableProcessor():
+class ArangoTableProcessor:
     __TABLE_COLLECTION = 'parsed_tables'
     __PAGE_COLLECTION = 'visited_pages'
     __EDGE_COLLECTION = 'htw_edges'
@@ -164,10 +165,36 @@ class ArangoTableProcessor():
 
             print("Processed %d out of %d webpages" % (processed, len(all_pages)))
 
+    def backfill_preprocess_results(self):
+        # Collect all pending tasks
+        pending_tasks = []
+        cursor = self.db.aql.execute(
+            f"FOR table IN {self.__TABLE_COLLECTION} RETURN [table.preprocessing, table._id]",
+        )
+        for preprocess, document_id in cursor:
+            if 'task_id' in preprocess:
+                pending_tasks.append([preprocess['task_id'], document_id])
+        
+        # Try to backfill all the missing preprocessing results
+        client = TableAnnotationAPIClient()
+        for task_id, document_id in pending_tasks:
+            task_status = client.get_preprocess_task_status(task_id)
+            if task_status.get('Task status') == 'SUCCESS':
+                task_result = client.get_preprocess_task_result(task_id)
+                if 'output' in task_result:
+                    self.db.update_document({'_id': document_id, 'preprocessing': task_result})
+                    print("UPDATED: table (%s) preprocessing data" % document_id)
+                else:
+                    print("ERROR: Failed to update document", task_id, task_result)
+            else:
+                print('WARNING: no updates made to table %s (%s): %s' % (document_id, task_id, task_status))
+
+
 def main():
     job = ArangoTableProcessor()
     job.create_page_table_edges()
     job.create_page_referrer_edges()
+    job.backfill_preprocess_results()
 
 if __name__ == "__main__":
     main()

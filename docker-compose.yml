@@ -21,6 +21,8 @@ services:
       - "9092:9092"
     depends_on:
       - zookeeper
+    labels:
+      com.htw.export-logs: "true"
     environment:
       KAFKA_LISTENERS: PLAINTEXT://:9092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
@@ -49,7 +51,9 @@ services:
       KAFKA_TOPIC: 'tablecollector'
       ARANGO_HOST: http://arangodb:8529
       ARANGO_CREDENTIALS: '{"username":"root","password":"${ARANGO_ROOT_PASSWORD}"}'
-    command: ['python', 'ingestion/kafka_consumer.py']
+      ORANGE_CLIENT_ID: "${ORANGE_CLIENT_ID}"
+      ORANGE_CLIENT_SECRET: "${ORANGE_CLIENT_SECRET}"
+    command: ['python', '-m', 'ingestion.kafka_consumer']
 
   spider:
     <<: *core
