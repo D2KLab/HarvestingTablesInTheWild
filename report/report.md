@@ -72,23 +72,28 @@ Service Components:
 <!-- Motivation for Scrapy -->
 #### Motivation for different design elements used.
 __Scrapy__
-Scrapy is an application framework that not only allows crawling the webpages using the spiders, but also parsing of the extracted webpages using selectors. This is in contrast with the libraries such as BeautifulSoup [^beautiful-soup] that only support parsing.
+Scrapy is an application framework that not only allows crawling the webpages using the spiders, but also parsing of the extracted webpages using selectors.
+This is in contrast with the libraries such as BeautifulSoup [^beautiful-soup] that only support parsing.
 
-The other big motivation behind selecting scrapy was the support for independent crawlers through the framework. That means management/life-cycle of crawlers, independent pipeline with an integration with common middlewares etc was handled by the framework itself rather than being managed by us. Use of libraries such as kafka-python [^kafka-python] ensured a easier integration with the message queue.
+The other big motivation behind selecting scrapy was the support for independent crawlers through the framework. That means management/life-cycle of crawlers, independent pipeline with an integration with common middlewares etc was handled by the framework itself rather than being managed by us. 
+Use of libraries such as kafka-python [^kafka-python] ensured a easier integration with the message queue.
 
 [^beautiful-soup]: https://www.crummy.com/software/BeautifulSoup/
 [^kafka-python]: https://github.com/dfdeshom/scrapy-kafka 
 
 
 __Kafka__:
-Kafka is one of the most popular message queue systems and is extensively used for distributed _event_ streaming services. Kafka follows a log-commited approach for message bus and hence can also be used as a temporary store of messages for a desirable unit of time. This is unlike other message queue such as RabbitMQ [^rabbit-mq] that cannot store any message in case of a database failure.
+Kafka is one of the most popular message queue systems and is extensively used for distributed _event_ streaming services. 
+Kafka follows a log-commited approach for message bus and hence can also be used as a temporary store of messages for a desirable unit of time.
+This is unlike other message queue such as RabbitMQ [^rabbit-mq] that cannot store any message in case of a database failure.
 
 Since we were using containerized Kafka images, it was also easy to control the topics, replication of topics and partitions using the environment variables instead of using an admin API.
 
 [^rabbit-mq]: https://www.rabbitmq.com/
 <!-- DONE: What was the motivation for using ArangoDB (while the Kibana stack is generally associated with ElasticSearch)? -->
 __ArangoDb__:
-Finally, we decided use ArangoDB as our storage backend. Unlike other NoSQL databases, ArangoDB natively supports multiple data models: document store, graph store and full-text search.
+Finally, we decided use ArangoDB as our storage backend. 
+Unlike other NoSQL databases, ArangoDB natively supports multiple data models: document store, graph store and full-text search.
 This means it combines the capabilities of databases such as MongoDB, Neo4j and Elasticsearch all into one database.
 This is excellent for quick prototyping, because it allows us to focus on the data collection and ingestion first, and later we can explore various ways of accessing and analyzing the data. https://www.arangodb.com/resources/white-paper/multi-model-database/
 
