@@ -2,12 +2,14 @@ import os
 import json
 
 from arango import ArangoClient
-from annotation import TableAnnotationAPIClient
+from postprocessing.annotation import TableAnnotationAPIClient
+from postprocessing.models import OrangePreprocessHeavy
 
 # Useful References for ArangoDB graphs:
 # https://python-driver-for-arangodb.readthedocs.io/en/master/graph.html#edge-collections
 # https://python-driver-for-arangodb.readthedocs.io/en/master/specs.html#standardcollection
 # https://stackoverflow.com/a/23708645
+
 
 class ArangoTableProcessor:
     __TABLE_COLLECTION = 'parsed_tables'
@@ -37,13 +39,13 @@ class ArangoTableProcessor:
 
         # insert pseudo vertex for starting point
         self.pages.insert({
-                "_key": "htw_start",
-                "table_ids": [],
-                "page_title": "HTW Start",
-                "timestamp": "",
-                "referrer": "",
-                "url": "http://localhost",
-            })
+            "_key": "htw_start",
+            "table_ids": [],
+            "page_title": "HTW Start",
+            "timestamp": "",
+            "referrer": "",
+            "url": "http://localhost",
+        })
 
         # create graph (if necessary)
         if self.db.has_graph(self.__GRAPH):
@@ -58,9 +60,9 @@ class ArangoTableProcessor:
             self.edges = self.graph.create_edge_definition(
                 edge_collection=self.__EDGE_COLLECTION,
                 from_vertex_collections=[self.__PAGE_COLLECTION],
-                to_vertex_collections=[self.__TABLE_COLLECTION,self.__PAGE_COLLECTION],
+                to_vertex_collections=[
+                    self.__TABLE_COLLECTION, self.__PAGE_COLLECTION],
             )
-
 
     def create_page_table_edges(self):
         """
@@ -103,11 +105,11 @@ class ArangoTableProcessor:
 
             # create page entry
             page = {
-                "table_ids":table_ids,
-                "page_title":title,
-                "timestamp":timestamp,
-                "referrer":referrer,
-                "url":url,
+                "table_ids": table_ids,
+                "page_title": title,
+                "timestamp": timestamp,
+                "referrer": referrer,
+                "url": url,
             }
 
             # insert page into database
@@ -163,31 +165,59 @@ class ArangoTableProcessor:
                 }
             )
 
-            print("Processed %d out of %d webpages" % (processed, len(all_pages)))
+            print("Processed %d out of %d webpages" %
+                  (processed, len(all_pages)))
 
     def backfill_preprocess_results(self):
         # Collect all pending tasks
         pending_tasks = []
         cursor = self.db.aql.execute(
-            f"FOR table IN {self.__TABLE_COLLECTION} RETURN [table.preprocessing, table._id]",
+            f"""
+            FOR table IN {self.__TABLE_COLLECTION}
+            FILTER table.preprocessing != null
+            RETURN [table.preprocessing, table._id]
+            """,
         )
         for preprocess, document_id in cursor:
             if 'task_id' in preprocess:
                 pending_tasks.append([preprocess['task_id'], document_id])
-        
+            else:
+                print("WARNING: unexpected preprocessing value found",
+                      document_id, preprocess)
+
         # Try to backfill all the missing preprocessing results
         client = TableAnnotationAPIClient()
         for task_id, document_id in pending_tasks:
             task_status = client.get_preprocess_task_status(task_id)
-            if task_status.get('Task status') == 'SUCCESS':
-                task_result = client.get_preprocess_task_result(task_id)
-                if 'output' in task_result:
-                    self.db.update_document({'_id': document_id, 'preprocessing': task_result})
-                    print("UPDATED: table (%s) preprocessing data" % document_id)
-                else:
-                    print("ERROR: Failed to update document", task_id, task_result)
+            if task_status.get('task_status') == 'SUCCESS':
+                task_result = client.get_preprocess_task_result_heavy(task_id)
+                # NOTE:
+                # The API is unreliable, and the following line is only
+                # here because of the observed behaviour differs from
+                # the documented behaviour
+                if isinstance(task_result, list):
+                    task_result = task_result[0]
+                self.backfill_single_document(document_id, task_result)
+                print("UPDATED: table (%s) preprocessing data" %
+                      document_id)
             else:
-                print('WARNING: no updates made to table %s (%s): %s' % (document_id, task_id, task_status))
+                print('WARNING: no updates made to table %s (%s): %s' %
+                      (document_id, task_id, task_status))
+
+    # pylint: disable=broad-except
+    def backfill_single_document(self, document_id, orange_data):
+        try:
+            orange_data = OrangePreprocessHeavy(orange_data)
+            document = self.db.document(document_id)
+            document['preprocessing'] = None
+            document['tableOrientation'] = orange_data.orientation.orientation
+            document['headers'] = orange_data.header.header
+            document['relation'] = orange_data.restructured_table
+            # TODO: figure this out from the response
+            document['hasHeader'] = True
+            self.db.update_document(document)
+        except Exception as e:
+            print("ERROR: Failed to update document", orange_data, e)
 
 
 def main():
@@ -195,6 +225,7 @@ def main():
     job.create_page_table_edges()
     job.create_page_referrer_edges()
     job.backfill_preprocess_results()
+
 
 if __name__ == "__main__":
     main()

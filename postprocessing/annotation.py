@@ -75,7 +75,10 @@ class TableAnnotationAPIClient(OrangeAPIClient):
     def get_preprocess_task_status(self, task_id):
         return self.get_json(f"/table_annotation/beta/preprocessing/{task_id}")
 
-    def get_preprocess_task_result(self, task_id):
+    def get_preprocess_task_result_light(self, task_id):
+        return self.get_json(f"/table_annotation/beta/preprocessing/{task_id}/result?format=light")
+
+    def get_preprocess_task_result_heavy(self, task_id):
         return self.get_json(f"/table_annotation/beta/preprocessing/{task_id}/result")
 
     # pylint: disable=no-self-use
