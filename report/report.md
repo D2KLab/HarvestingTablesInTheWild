@@ -235,7 +235,7 @@ Occasionally, there were errors as websites were not reachable anymore (dead lin
 The extracted table items were sent through the message queue and inserted into the database by our ingestion service.
 
 This initial crawl was seeded with just a handful of URLs and therefore the content of the visited pages was heavily skewed towards certain topics.
-This was not an issue however, since meaningful data collection was not en explicit goal of our first test.
+This was not an issue however, since meaningful data collection was not an explicit goal of our first test.
 
 ## Crawling strategy
 
@@ -307,7 +307,7 @@ However, this would first require a data format compatibility study.
 Once these level of system performance has been captured, the table filtering and extraction algorithms implemented so far can be improved upon.
 In particular, the works from Ritze et al. [7] as well as Eberius et al. [11] should serve as an excellent starting point for these optimizations.
 
-Finally, the crawling strategy used for downloading pages from the world wide web should be tweaked. While a basic mechanism to avoid crawling the same URL multiple times has been implemented, websites have become very complex today and often host the same content on multiple distinct URLs. The knowledge that has been gained through search engine (and search engine optimization) in the last 15 years should be drawn upon.
+Finally, the crawling strategy used for downloading pages from the world wide web should be tweaked. While a basic mechanism to avoid crawling the same URL multiple times has been implemented, websites have become very complex today and often host the same content on multiple distinct URLs. The knowledge that has been gained through search engines (and search engine optimization) in the last 15 years should be drawn upon.
 
 At the same time, another interesting avenue for research is purposely re-visiting pages that have been crawled before, to check for updates made to those pages.
 
