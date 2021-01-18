@@ -83,7 +83,8 @@ The other big motivation behind selecting scrapy was the support for independent
 __Kafka__:
 Kafka is one of the most popular message queue systems and is extensively used for distributed _event_ streaming services. Kafka follows a log-commited approach for message bus and hence can also be used as a temporary store of messages for a desirable unit of time. This is unlike other message queue such as RabbitMQ [^rabbit-mq] that cannot store any message in case of a database failure.
 
-Kafka 
+Since we were using containerized Kafka images, it was also easy to control the topics, replication of topics and partitions using the environment variables instead of using an admin API.
+
 [^rabbit-mq]: https://www.rabbitmq.com/
 <!-- DONE: What was the motivation for using ArangoDB (while the Kibana stack is generally associated with ElasticSearch)? -->
 __ArangoDb__:
@@ -97,11 +98,10 @@ In addition to the web table harvesting system, we also deployed a parallel moni
 ![Monitoring architecture](images/elk.png)
 
 Monitoring infrastructure components:
-* Logspout
-  * It was used for docker logs redirection to logstash.
-* LogStash for log aggregation
-* Elasticsearch for indexing and storage
-* Kibana for analytics and visualization
+* Logspout: used for docker logs redirection to logstash.
+* LogStash: used for log aggregation
+* Elasticsearch: used for indexing and storage
+* Kibana: used for analytics and visualization
 
 
 # Implementation and Milestones
