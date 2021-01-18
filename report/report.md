@@ -69,10 +69,25 @@ Service Components:
 * PostProcessing services such as table annotation service
 
 
-<!-- DONE: What was the motivation for using ArangoDB (while the Kibana stack is generally associated with ElasticSearch)? -->
+<!-- Motivation for Scrapy -->
+#### Motivation for different design elements used.
+__Scrapy__
+Scrapy is an application framework that not only allows crawling the webpages using the spiders, but also parsing of the extracted webpages using selectors. This is in contrast with the libraries such as BeautifulSoup [^beautiful-soup] that only support parsing.
 
-Finally, we decided use ArangoDB as our storage backend.
-Unlike other NoSQL databases, ArangoDB natively supports multiple data models: document store, graph store and full-text search.
+The other big motivation behind selecting scrapy was the support for independent crawlers through the framework. That means management/life-cycle of crawlers, independent pipeline with an integration with common middlewares etc was handled by the framework itself rather than being managed by us. Use of libraries such as kafka-python [^kafka-python] ensured a easier integration with the message queue.
+
+[^beautiful-soup]: https://www.crummy.com/software/BeautifulSoup/
+[^kafka-python]: https://github.com/dfdeshom/scrapy-kafka 
+
+
+__Kafka__:
+Kafka is one of the most popular message queue systems and is extensively used for distributed _event_ streaming services. Kafka follows a log-commited approach for message bus and hence can also be used as a temporary store of messages for a desirable unit of time. This is unlike other message queue such as RabbitMQ [^rabbit-mq] that cannot store any message in case of a database failure.
+
+Kafka 
+[^rabbit-mq]: https://www.rabbitmq.com/
+<!-- DONE: What was the motivation for using ArangoDB (while the Kibana stack is generally associated with ElasticSearch)? -->
+__ArangoDb__:
+Finally, we decided use ArangoDB as our storage backend. Unlike other NoSQL databases, ArangoDB natively supports multiple data models: document store, graph store and full-text search.
 This means it combines the capabilities of databases such as MongoDB, Neo4j and Elasticsearch all into one database.
 This is excellent for quick prototyping, because it allows us to focus on the data collection and ingestion first, and later we can explore various ways of accessing and analyzing the data. https://www.arangodb.com/resources/white-paper/multi-model-database/
 
@@ -82,7 +97,8 @@ In addition to the web table harvesting system, we also deployed a parallel moni
 ![Monitoring architecture](images/elk.png)
 
 Monitoring infrastructure components:
-* Logspout for docker logs redirection
+* Logspout
+  * It was used for docker logs redirection to logstash.
 * LogStash for log aggregation
 * Elasticsearch for indexing and storage
 * Kibana for analytics and visualization
