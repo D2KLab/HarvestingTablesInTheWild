@@ -23,7 +23,7 @@ While plain text data (such as regular HTML websites) are still comprehendible b
 
 One such example are HTML tables. From human perspective they are intuitively easy to understand (just by looking at them), but for a machine they are difficult to assess because of the graphical nature of them: all the little visual details (such as delimiters and orientation) matter a lot.
 At the same time, the tables themselves usually just contain the data (e.g. statistics), while the surrounding text (headers, captions and description) gives this data meaning.
-For example, the information pair "TSLA, 2007-12-03, 1234" is useless if we do not know what we are dealing with stock prices.
+For example, the information pair "TSLA, 2007-12-03, 1234" is useless if we do not know that we are dealing with stock prices.
 
 As we will outline in Section 2, there has already been significant academic work in the field of semantic table interpretation.
 To develop, compare and optimize these systems however, large datasets are required.
@@ -41,8 +41,30 @@ In this section we will give an overview of background literature and related wo
 
 ## Datasets
 
+Macdonald and Barbosa have produced one of the most recent public corpora of web tables.
+More specifically, their research introduces a publicly available dataset [^macdonald] for benchmarking information extraction from HTML tables.
+
+[^macdonald]: [https://dataverse.library.ualberta.ca/dataset.xhtml?persistentId=doi:10.7939/DVN/SHL1SL](https://dataverse.library.ualberta.ca/dataset.xhtml?persistentId=doi:10.7939/DVN/SHL1SL)
+
 ## Semantic Table Interpretation
 
+Table interpretation is the act of giving semantic meaning to raw table data.
+Among many other steps, this includes determining the data types of columns, the semantic object entities of each column and the relations between columns.
+
+Ritze et al. have developed an algorithm to match HTML tables to DBpedia [7].
+The "T2K Match" algorithm is an iterative matching method combining schema and instance matching for matching mostly small and narrow HTML tables against cross-domain knowledge bases.
+The source code for this matching system is publicly available [^t2k]
+Associating the table cells to semantic entities in knowledge bases greatly helps machines to deal with the logic of tables.
+
+[^t2k]: [https://github.com/T2KFramework/T2K](https://github.com/T2KFramework/T2K)
+
+More recently, Chabot et al. have described a similar system named "DAGOBAH" [8].
+DAGOBAH semantically annotates tables with entities either from Wikidata or DBpedia.
+It does this by determining the column types as well as performing cell and column annotation and relationship identification.
+The system delivered promising results in the "Tabular Data to Knowledge Graph Matching" challenge [8], therefore we will be using it to annotate the tables in our processing pipeline.
+Furthermore, we had access to an API of this system in private beta as part of the Orange API [^orangeAPI].
+
+[^orangeAPI]: [https://developer.orange.com/products/all-apis/](https://developer.orange.com/products/all-apis/)
 
 # System requirements and design
 
@@ -75,21 +97,21 @@ __Scrapy__
 Scrapy is an application framework for web scraping implemented in Python. It not only crawls the webpages using the spiders, but also has built-in support for web-page parsing with parsel [^parsel].
 This is in contrast with the libraries such as BeautifulSoup [^beautiful-soup] that only support parsing.
 
-The other big motivation behind selecting scrapy was the fine-grained support for customizable scrapy settings. It not only project level setting,but also independent setting per spider. 
-This essentially means management/life-cycle, integration with middlewares etc could be controlled independently. 
+The other big motivation behind selecting scrapy was the fine-grained support for customizable scrapy settings. It not only project level setting,but also independent setting per spider.
+This essentially means management/life-cycle, integration with middlewares etc could be controlled independently.
 Use of libraries such as kafka-python [^kafka-python] ensured a easier integration with the message queue.
 
 [^parsel]: Parsel is a library to extract individual elements of web pages with XPath or CSS selectors.
 [^beautiful-soup]: https://www.crummy.com/software/BeautifulSoup/
-[^kafka-python]: https://github.com/dfdeshom/scrapy-kafka 
+[^kafka-python]: https://github.com/dfdeshom/scrapy-kafka
 
 
 __Kafka__:
 Messages queues are extensively used for asynchronous communication. A message queue serves as a buffer, meaning that the crawler is never slowed down by a slow ingestion rate (e.g. due to high load on the database).
-Moreover, as the ingestion service is not interacting directly with the producer (crawler), it does not become a bottleneck and allows the ingestion service to process items out of the message queue at any speed. 
+Moreover, as the ingestion service is not interacting directly with the producer (crawler), it does not become a bottleneck and allows the ingestion service to process items out of the message queue at any speed.
 This gives the ingestion service more headroom to perform time consuming tasks, such as augmenting the tables with data obtained from external APIs.
 
-Our preferred choice of message queue was Kafka [^kafka] as it is one of the most popular message queue systems and is extensively used for distributed _event_ streaming services. 
+Our preferred choice of message queue was Kafka [^kafka] as it is one of the most popular message queue systems and is extensively used for distributed _event_ streaming services.
 Kafka follows a log-commited approach for message bus and hence can also be used as a temporary store of messages for a desirable unit of time.
 This is unlike other message queue such as RabbitMQ [^rabbit-mq] that cannot store any message in case of a database failure.
 
@@ -99,17 +121,19 @@ Since we were using containerized Kafka images, it was also easy to control the 
 [^rabbit-mq]: https://www.rabbitmq.com/
 <!-- DONE: What was the motivation for using ArangoDB (while the Kibana stack is generally associated with ElasticSearch)? -->
 __ArangoDb__:
-Finally, we decided use ArangoDB as our storage backend. 
+Finally, we decided use ArangoDB as our storage backend.
 Unlike other NoSQL databases, ArangoDB natively supports multiple data models: document store, graph store and full-text search.
 This means it combines the capabilities of databases such as MongoDB, Neo4j and Elasticsearch all into one database.
 This is excellent for quick prototyping, because it allows us to focus on the data collection and ingestion first, and later we can explore various ways of accessing and analyzing the data. https://www.arangodb.com/resources/white-paper/multi-model-database/
 
 ## Monitoring Infrastructure
-In addition to the web table harvesting system, we also deployed a parallel monitoring infrastructure for a proper log monitoring and visualization. This infrastructure was based on the popular ELK stack i.e. Elasticsearch, Logstash, and Kibana. ELK stack is completely open-source, popular and can analyze and visualize logs from multiple sources in real time.
+
+In addition to the web table harvesting system, we also deployed a parallel monitoring infrastructure for a proper log monitoring and visualization. This infrastructure was based on the popular ELK stack i.e. Elasticsearch, Logstash, and Kibana. ELK stack is a popular platform to analyze and visualize logs from multiple sources in real time.
 
 ![Monitoring architecture](images/elk.png)
 
 Monitoring infrastructure components:
+
 * Logspout: used for docker logs redirection to logstash.
 * LogStash: used for log aggregation
 * Elasticsearch: used for indexing and storage
@@ -177,8 +201,9 @@ This would increase the complexity of our data pipeline significantly.
 
 Since the WTC format is based on the DWTC format, the DWTC seemed to be a widely used and proven data format.
 We also considered the attributes it contained relevant to our use case, but at the same time decided to extend it with additional metadata and also incorporate some fields from the TableNet format.
+We hope that this common choice will enable others to easily reuse parts of our pipeline or the data.
 
-To document our final data format and make sure our own application adheres to it, we created a JSON schema definition (Appendix ABC).
+To document our final data format and make sure our own application adheres to it, we created a JSON schema definition (Appendix TODO).
 
 ## Common Crawl
 
@@ -189,17 +214,45 @@ In addition to crawling pages from the world wide web, we also wanted to explore
 
 <!-- TODO: When you go over a page which has been previously crawled, do you have mechanism to detect changes on the page or not?  -->
 
+Approximately three months after the start of the project, we conducted a first, short test run of our table collection pipeline.
+This was to make sure the components we had developed and integrated so far all worked correctly and could sustain operating for a prolonged period of time.
+During the 8 hours run, we collected 22.000 tables from 5156 webpages on 153 unique domains.
+
+```
+db._query(`RETURN LENGTH(parsed_tables)`).toArray()[0];
+> 22909
+
+db._query(`FOR t in parsed_tables RETURN t.url`).toArray().filter((v, i, a) => a.indexOf(v) === i).length;
+> 5156
+
+db._query(`FOR t in parsed_tables RETURN t.url`).toArray().map(function(url) { return url.split("/")[2]; }).filter((v, i, a) => a.indexOf(v) === i).length;
+> 153
+```
+
+An in-depth look at the collected data revealed that our pipeline worked as intended.
+The spider component downloaded web pages and extracted tables from them.
+Occasionally, there were errors as websites were not reachable anymore (dead links).
+The extracted table items were sent through the message queue and inserted into the database by our ingestion service.
+
+This initial crawl was seeded with just a handful of URLs and therefore the content of the visited pages was heavily skewed towards certain topics.
+This was not an issue however, since meaningful data collection was not en explicit goal of our first test.
+
 ## Crawling strategy
 
 After analyzing the results from our first crawl, we had to (d/r)efine our crawling strategy.
 
 *TBD*
 
+* Seed URLs
+* Domain blacklist
+* Two-tier crawling strategy
+* No re-crawling of visited web pages
+
 ## Visualization
 
 <!-- Describe visualization and exploration in the arangodb dashboard. -->
 
-With these first results, we started the exploring the graph capabilities of the ArangoDB backend.
+With these first results, we started exploring the graph capabilities of the ArangoDB backend.
 Until now we used the database only as a simple document store.
 
 In ArangoDB, documents stored in a regular *collection* ("database table") act as *vertices* ("nodes").
@@ -245,10 +298,18 @@ What we managed to do and why/how it could be useful (and what we didn't achieve
 
 # Future work
 
-How the work we have done so far can be continued or improved.
+<!-- How the work we have done so far can be continued or improved. -->
 
-* Improve table filtering and extraction algorithm
-* Improve crawling strategy
+For future work, the first would be measuring the current performance of the system.
+For this task a dataset, such as the one released by Macdonald and Barbosa, could be used to measure the extraction and detection accuracy of the system.
+However, this would first require a data format compatibility study.
+
+Once these level of system performance has been captured, the table filtering and extraction algorithms implemented so far can be improved upon.
+In particular, the works from Ritze et al. [7] as well as Eberius et al. [11] should serve as an excellent starting point for these optimizations.
+
+Finally, the crawling strategy used for downloading pages from the world wide web should be tweaked. While a basic mechanism to avoid crawling the same URL multiple times has been implemented, websites have become very complex today and often host the same content on multiple distinct URLs. The knowledge that has been gained through search engine (and search engine optimization) in the last 15 years should be drawn upon.
+
+At the same time, another interesting avenue for research is purposely re-visiting pages that have been crawled before, to check for updates made to those pages.
 
 \clearpage
 
@@ -265,6 +326,17 @@ How the work we have done so far can be continued or improved.
 [5] http://webdatacommons.org/webtables/#results-2015
 
 [6] https://www.w3.org/TR/tabular-data-primer/
+
+[7] https://dl.acm.org/doi/10.1145/2797115.2797118
+
+[8] http://ceur-ws.org/Vol-2553/paper6.pdf
+
+[9] http://ceur-ws.org/Vol-2775/
+
+[10] Macdonald, Erin; Barbosa, Denilson, 2019, "An Annotated Corpus of Webtables for Information Extraction Tasks", https://doi.org/10.7939/DVN/SHL1SL, UAL Dataverse, V2
+
+[11] J. Eberius, K. Braunschweig, M. Hentsch, M. Thiele, A. Ahmadov and W. Lehner, "Building the Dresden Web Table Corpus: A Classification Approach," 2015 IEEE/ACM 2nd International Symposium on Big Data Computing (BDC), Limassol, 2015, https://doi.org/10.1145/2791347.2791353
+
 
 # Appendices
 
