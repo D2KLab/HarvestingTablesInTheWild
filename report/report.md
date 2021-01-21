@@ -75,56 +75,46 @@ Specific implementation details will be outlined in Section 3.
 
 ![System architecture](images/archi.png)
 
+Our pipeline consists of three main components: Scrapy Spiders (CommonCrawl and Web Spider) for downloading web pages, Kafka message queue for buffering extracted tables and ArangoDB database for storing them.
+To integrate these individual components, we have developed services to integrate them: an ingestion service for taking items from the message queue, performing annotations and inserting them into the database; and post-processing service for performing processing on the entire dataset (e.g. creating a graph structure).
 
-Language Used: Python 3
+We opted for the Python programming language for our implementation because it very well suited for the task of crawling web pages.
+Its flexibility and loose typing make it very convenient to deal with arbitrary and unformatted data.
+Finally, it has many excellent open source libraries available.
 
-System Design:
-
-* Scrapy
-* Kafka Message Queue
-* ArangoDB Database
-
-Service Components:
-
-* Scrapy Spiders such as Common crawl Spider and web spider
-* Ingestion Service
-* PostProcessing services such as table annotation service
-
-
-<!-- Motivation for Scrapy -->
-#### Motivation for different design elements used.
-__Scrapy__
-Scrapy is an application framework for web scraping implemented in Python. It not only crawls the webpages using the spiders, but also has built-in support for web-page parsing with parsel [^parsel].
+For the crawling itself, we decided to use the open-source Scrapy application framework [^scrapy]. It not only crawls the webpages using the spiders, but also has built-in support for web-page parsing with parsel [^parsel].
 This is in contrast with the libraries such as BeautifulSoup [^beautiful-soup] that only support parsing.
 
-The other big motivation behind selecting scrapy was the fine-grained support for customizable scrapy settings. It not only project level setting,but also independent setting per spider.
-This essentially means management/life-cycle, integration with middlewares etc could be controlled independently.
-Use of libraries such as kafka-python [^kafka-python] ensured a easier integration with the message queue.
+Scrapy provides well thought-out scaffolding and project structure for each of its main components: spiders (modules for crawling web pages), middlewares (modules for modifying and discarding requests) and items (the pipeline result).
+Since all of them are combined into a pipeline by Scrapy's "engine", they are running in parallel and independent from each other.
+Furthermore, for each of these components either project-level (download speed, parallel connections etc.) or individual settings (e.g. log verbosity) can be applied.
 
+![Scrapy Architecture, *Scrapy Documentation*](images/scrapy_architecture_02.png)
+
+[^scrapy]: [https://scrapy.org/](https://scrapy.org/)
 [^parsel]: Parsel is a library to extract individual elements of web pages with XPath or CSS selectors.
-[^beautiful-soup]: https://www.crummy.com/software/BeautifulSoup/
-[^kafka-python]: https://github.com/dfdeshom/scrapy-kafka
+[^beautiful-soup]: [https://www.crummy.com/software/BeautifulSoup/](https://www.crummy.com/software/BeautifulSoup/)
 
-
-__Kafka__:
 Messages queues are extensively used for asynchronous communication. A message queue serves as a buffer, meaning that the crawler is never slowed down by a slow ingestion rate (e.g. due to high load on the database).
-Moreover, as the ingestion service is not interacting directly with the producer (crawler), it does not become a bottleneck and allows the ingestion service to process items out of the message queue at any speed.
+Moreover, as the ingestion service (consumer) is not interacting directly with the crawler (producer), it does not become a bottleneck and allows the ingestion service to process items out of the message queue at any speed.
 This gives the ingestion service more headroom to perform time consuming tasks, such as augmenting the tables with data obtained from external APIs.
 
 Our preferred choice of message queue was Kafka [^kafka] as it is one of the most popular message queue systems and is extensively used for distributed _event_ streaming services.
 Kafka follows a log-commited approach for message bus and hence can also be used as a temporary store of messages for a desirable unit of time.
-This is unlike other message queue such as RabbitMQ [^rabbit-mq] that cannot store any message in case of a database failure.
+This is unlike other message queues, such as RabbitMQ [^rabbit-mq], that cannot store any message in case of a database failure.
 
 Since we were using containerized Kafka images, it was also easy to control the topics, replication of topics and partitions using the environment variables instead of using an admin API.
 
 [^kafka]: https://kafka.apache.org/
 [^rabbit-mq]: https://www.rabbitmq.com/
+
 <!-- DONE: What was the motivation for using ArangoDB (while the Kibana stack is generally associated with ElasticSearch)? -->
-__ArangoDb__:
-Finally, we decided use ArangoDB as our storage backend.
+Finally, we decided use ArangoDB as our storage backend [^arangodb].
 Unlike other NoSQL databases, ArangoDB natively supports multiple data models: document store, graph store and full-text search.
-This means it combines the capabilities of databases such as MongoDB, Neo4j and Elasticsearch all into one database.
-This is excellent for quick prototyping, because it allows us to focus on the data collection and ingestion first, and later we can explore various ways of accessing and analyzing the data. https://www.arangodb.com/resources/white-paper/multi-model-database/
+This means it combines the capabilities of databases such as MongoDB, Neo4j and Elasticsearch all into one database [12].
+This is excellent for quick prototyping, because it allows us to focus on the data collection and ingestion first, and later we can explore various ways of accessing and analyzing the data.
+
+[^arangodb]: [https://www.arangodb.com](https://www.arangodb.com)
 
 ## Monitoring Infrastructure
 
@@ -149,9 +139,6 @@ This section will cover our implementation and the milestones we have completed 
 
 The first significant milestone we reached was the basic crawling of web pages (i.e. downloading the HTML contents) and extracting the HTML tables.
 At this stage, our tool would simply take a list of URLs, download and parse these pages and finally store the results in a JSON file.
-
-We opted for the Python programming language for our implementation because it very well suited for the task of crawling web pages, its flexibility and loose typing make it very convenient to deal with arbitrary and unformatted data and finally it has many excellent open source libraries available.
-For the crawling itself, we decided to use the Scrapy framework \cite{scrapy} **TODO** *why?*
 
 <!-- TODO: What library, if any, did you use to actually perform the table extraction (or was it coded from scratch)? Does Scrapy only manage the crawling part?  -->
 
@@ -222,10 +209,13 @@ During the 8 hours run, we collected 22.000 tables from 5156 webpages on 153 uni
 db._query(`RETURN LENGTH(parsed_tables)`).toArray()[0];
 > 22909
 
-db._query(`FOR t in parsed_tables RETURN t.url`).toArray().filter((v, i, a) => a.indexOf(v) === i).length;
+db._query(`FOR t in parsed_tables RETURN t.url`).toArray()\
+  .filter((v, i, a) => a.indexOf(v) === i).length;
 > 5156
 
-db._query(`FOR t in parsed_tables RETURN t.url`).toArray().map(function(url) { return url.split("/")[2]; }).filter((v, i, a) => a.indexOf(v) === i).length;
+db._query(`FOR t in parsed_tables RETURN t.url`).toArray()\
+  .map(function(url) { return url.split("/")[2]; })\
+  .filter((v, i, a) => a.indexOf(v) === i).length;
 > 153
 ```
 
@@ -235,7 +225,7 @@ Occasionally, there were errors as websites were not reachable anymore (dead lin
 The extracted table items were sent through the message queue and inserted into the database by our ingestion service.
 
 This initial crawl was seeded with just a handful of URLs and therefore the content of the visited pages was heavily skewed towards certain topics.
-This was not an issue however, since meaningful data collection was not an explicit goal of our first test.
+This was not an issue however, since meaningful data collection was not en explicit goal of our first test.
 
 ## Crawling strategy
 
@@ -307,7 +297,8 @@ However, this would first require a data format compatibility study.
 Once these level of system performance has been captured, the table filtering and extraction algorithms implemented so far can be improved upon.
 In particular, the works from Ritze et al. [7] as well as Eberius et al. [11] should serve as an excellent starting point for these optimizations.
 
-Finally, the crawling strategy used for downloading pages from the world wide web should be tweaked. While a basic mechanism to avoid crawling the same URL multiple times has been implemented, websites have become very complex today and often host the same content on multiple distinct URLs. The knowledge that has been gained through search engines (and search engine optimization) in the last 15 years should be drawn upon.
+Finally, the crawling strategy used for downloading pages from the world wide web should be tweaked. While a basic mechanism to avoid crawling the same URL multiple times has been implemented, websites have become very complex today and often host the same content on multiple distinct URLs. The knowledge that has been gained through search engine (and search engine optimization) in the last 15 years should be drawn upon.
+
 
 At the same time, another interesting avenue for research is purposely re-visiting pages that have been crawled before, to check for updates made to those pages.
 
@@ -337,6 +328,7 @@ At the same time, another interesting avenue for research is purposely re-visiti
 
 [11] J. Eberius, K. Braunschweig, M. Hentsch, M. Thiele, A. Ahmadov and W. Lehner, "Building the Dresden Web Table Corpus: A Classification Approach," 2015 IEEE/ACM 2nd International Symposium on Big Data Computing (BDC), Limassol, 2015, https://doi.org/10.1145/2791347.2791353
 
+[12] https://www.arangodb.com/resources/white-paper/multi-model-database/
 
 # Appendices
 
