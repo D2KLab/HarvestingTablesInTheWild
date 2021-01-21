@@ -193,7 +193,7 @@ Since the WTC format is based on the DWTC format, the DWTC seemed to be a widely
 We also considered the attributes it contained relevant to our use case, but at the same time decided to extend it with additional metadata and also incorporate some fields from the TableNet format.
 We hope that this common choice will enable others to easily reuse parts of our pipeline or the data.
 
-To document our final data format and make sure our own application adheres to it, we created a JSON schema definition (Appendix TODO).
+To document our final data format and make sure our own application adheres to it, we created a JSON schema definition ([Appendix A](#a.-json-schema-definition)).
 
 ## Common Crawl
 
@@ -247,18 +247,18 @@ Once the crawler arrives on webpage that is not in the whitelist, it still crawl
 
 For creating the domain whitelist, we manually composed a list of domains most relevant to our usecase (HTML table extraction from webpages) based on three sources: Alexa Top 500 ranking [^alexa], Moz Top 500 [^moz] and CommonCrawl Top 1000 domains ranked by harmonic centrality [^cc-domains].
 Our selection focused on domains with high-quality, English language content.
-The full list of whitelisted domains is available in Appendix TODO.
+The full list of whitelisted domains is available in [Appendix B](#b.-list-of-whitelisted-domains).
 
 Additionally, we also created a domain blacklist.
 One example that demonstrates the necessity of this is the mobile pages of Wikipedia, which are available under a different domain (en.m.wikipedia.org instead of en.wikipedia.org), but still contain the same content.
 Similarly, we decided to exclude non-english wikipedias, since we wanted to focus on english content.
-The full list of blacklisted domains is available in Appendix TODO.
+The full list of blacklisted domains is available in [Appendix C](#c.-list-of-blacklisted-domains).
 
 Finally, we also gathered a list of seed URLs.
 These URLs are given to the spider when it starts crawling and serve as an entrypoint to the vast world wide web.
 From there on the spider will automatically crawl linked pages, as described before.
 Therefore, the topic of the initial seed URLs will influence the direction of the entire crawl.
-The chosen list of seed URLs is shown in Appendix TODO.
+The chosen list of seed URLs is shown in [Appendix D](#d.-list-of-seed-urls).
 
 [^crawl-once]: [https://github.com/TeamHG-Memex/scrapy-crawl-once](https://github.com/TeamHG-Memex/scrapy-crawl-once)
 [^alexa]: [https://www.alexa.com/topsites](https://www.alexa.com/topsites)
@@ -335,7 +335,7 @@ In such cases, a headless browser environment is required which dramatically inc
 
 \clearpage
 
-# References
+# References {.unnumbered}
 
 [1] Hassan, Md Imrul, Hai L. Vu, and Taka Sakurai. *"Performance analysis of the IEEE 802.11 MAC protocol for DSRC safety applications."* IEEE Transactions on vehicular technology 60.8 (2011): 3882-3896.
 
@@ -361,12 +361,64 @@ In such cases, a headless browser environment is required which dramatically inc
 
 [12] https://www.arangodb.com/resources/white-paper/multi-model-database/
 
-# Appendices
+\clearpage
 
-## JSON schema definition
+# Appendices {.unnumbered}
+
+## A. JSON schema definition {.unnumbered}
 
 \lstinputlisting[basicstyle=\scriptsize\ttfamily]{../data/schema.json}
 
-## List of Seed URLs
+## B. List of whitelisted domains {.unnumbered}
+
+The domain itself as well as all subdomains are whitelisted.
+
+```
+android.com
+apache.org
+bbc.co.uk
+blogspot.com
+creativecommons.org
+doi.org
+en.wikipedia.org
+europe.eu
+gamepedia.com
+github.com
+github.io
+iana.org
+imdb.com
+medium.com
+merriam-webster.com
+microsoft.com
+mozilla.org
+nasa.gov
+nih.gov
+noaa.gov
+schema.org
+statista.com
+w.org
+wikibooks.org
+wikimedia.org
+wikiquote.org
+wordpress.com
+wordpress.org
+```
+
+## C. List of blacklisted domains {.unnumbered}
+
+Python Regular Expressions
+
+```python
+[
+    # blacklist everything except en.wikipedia.org:
+    r'^(?!.*(en)).*\.wikipedia\.org',
+    # blacklist everything except english wikis:
+    r'^(?!.*(en)).*\.wiki.*\.org',
+    # blacklist mobile pages:
+    r'^.*\.m\..*',
+]
+```
+
+## D. List of Seed URLs {.unnumbered}
 
 \lstinputlisting{../data/seed-urls.txt}
