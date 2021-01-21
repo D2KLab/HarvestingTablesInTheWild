@@ -69,9 +69,37 @@ Service Components:
 * PostProcessing services such as table annotation service
 
 
-<!-- DONE: What was the motivation for using ArangoDB (while the Kibana stack is generally associated with ElasticSearch)? -->
+<!-- Motivation for Scrapy -->
+#### Motivation for different design elements used.
+__Scrapy__
+Scrapy is an application framework for web scraping implemented in Python. It not only crawls the webpages using the spiders, but also has built-in support for web-page parsing with parsel [^parsel].
+This is in contrast with the libraries such as BeautifulSoup [^beautiful-soup] that only support parsing.
 
-Finally, we decided use ArangoDB as our storage backend.
+The other big motivation behind selecting scrapy was the fine-grained support for customizable scrapy settings. It not only project level setting,but also independent setting per spider. 
+This essentially means management/life-cycle, integration with middlewares etc could be controlled independently. 
+Use of libraries such as kafka-python [^kafka-python] ensured a easier integration with the message queue.
+
+[^parsel]: Parsel is a library to extract individual elements of web pages with XPath or CSS selectors.
+[^beautiful-soup]: https://www.crummy.com/software/BeautifulSoup/
+[^kafka-python]: https://github.com/dfdeshom/scrapy-kafka 
+
+
+__Kafka__:
+Messages queues are extensively used for asynchronous communication. A message queue serves as a buffer, meaning that the crawler is never slowed down by a slow ingestion rate (e.g. due to high load on the database).
+Moreover, as the ingestion service is not interacting directly with the producer (crawler), it does not become a bottleneck and allows the ingestion service to process items out of the message queue at any speed. 
+This gives the ingestion service more headroom to perform time consuming tasks, such as augmenting the tables with data obtained from external APIs.
+
+Our preferred choice of message queue was Kafka [^kafka] as it is one of the most popular message queue systems and is extensively used for distributed _event_ streaming services. 
+Kafka follows a log-commited approach for message bus and hence can also be used as a temporary store of messages for a desirable unit of time.
+This is unlike other message queue such as RabbitMQ [^rabbit-mq] that cannot store any message in case of a database failure.
+
+Since we were using containerized Kafka images, it was also easy to control the topics, replication of topics and partitions using the environment variables instead of using an admin API.
+
+[^kafka]: https://kafka.apache.org/
+[^rabbit-mq]: https://www.rabbitmq.com/
+<!-- DONE: What was the motivation for using ArangoDB (while the Kibana stack is generally associated with ElasticSearch)? -->
+__ArangoDb__:
+Finally, we decided use ArangoDB as our storage backend. 
 Unlike other NoSQL databases, ArangoDB natively supports multiple data models: document store, graph store and full-text search.
 This means it combines the capabilities of databases such as MongoDB, Neo4j and Elasticsearch all into one database.
 This is excellent for quick prototyping, because it allows us to focus on the data collection and ingestion first, and later we can explore various ways of accessing and analyzing the data. https://www.arangodb.com/resources/white-paper/multi-model-database/
@@ -82,10 +110,10 @@ In addition to the web table harvesting system, we also deployed a parallel moni
 ![Monitoring architecture](images/elk.png)
 
 Monitoring infrastructure components:
-* Logspout for docker logs redirection
-* LogStash for log aggregation
-* Elasticsearch for indexing and storage
-* Kibana for analytics and visualization
+* Logspout: used for docker logs redirection to logstash.
+* LogStash: used for log aggregation
+* Elasticsearch: used for indexing and storage
+* Kibana: used for analytics and visualization
 
 
 # Implementation and Milestones
