@@ -8,10 +8,13 @@ documentclass: article
 titlepage: true
 code-block-font-size: '\footnotesize'
 fontsize: 11pt
+logo: "images/tree.png"
+logo-width: 200
+title-page-rule-color: "000081"
+toc: true
+toc-own-page: true
+numbersections: true
 ---
-
-<!-- New page after table of contents -->
-\clearpage
 
 # Introduction
 
