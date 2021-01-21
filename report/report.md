@@ -366,3 +366,7 @@ In such cases, a headless browser environment is required which dramatically inc
 ## JSON schema definition
 
 \lstinputlisting[basicstyle=\scriptsize\ttfamily]{../data/schema.json}
+
+## List of Seed URLs
+
+\lstinputlisting{../data/seed-urls.txt}
