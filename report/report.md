@@ -8,10 +8,13 @@ documentclass: article
 titlepage: true
 code-block-font-size: '\footnotesize'
 fontsize: 11pt
+logo: "images/tree.png"
+logo-width: 200
+title-page-rule-color: "000081"
+toc: true
+toc-own-page: true
+numbersections: true
 ---
-
-<!-- New page after table of contents -->
-\clearpage
 
 # Introduction
 
@@ -190,7 +193,7 @@ Since the WTC format is based on the DWTC format, the DWTC seemed to be a widely
 We also considered the attributes it contained relevant to our use case, but at the same time decided to extend it with additional metadata and also incorporate some fields from the TableNet format.
 We hope that this common choice will enable others to easily reuse parts of our pipeline or the data.
 
-To document our final data format and make sure our own application adheres to it, we created a JSON schema definition (Appendix TODO).
+To document our final data format and make sure our own application adheres to it, we created a JSON schema definition ([Appendix A](#a.-json-schema-definition)).
 
 ## Common Crawl
 
@@ -229,14 +232,38 @@ This was not an issue however, since meaningful data collection was not en expli
 
 ## Crawling strategy
 
-After analyzing the results from our first crawl, we had to (d/r)efine our crawling strategy.
+After analyzing the results from our first crawl, we had to define a sensible crawling strategy.
+After the spider downloads a webpage, it extracts all hyperlink (inside HTML `<a>` tags) from it and generates new requests for these links.
 
-*TBD*
+Firstly, we enabled a Scrapy plugin that prevents crawling previously visited pages [^crawl-once].
+Such a feature is necessary because it is common for links in the header and footer of webpages to be same across an entire domain (e.g. Privacy Policy and About pages)
+This plugin keeps an sqlite database with all URLs that have been downloaded by the spider.
 
-* Seed URLs
-* Domain blacklist
-* Two-tier crawling strategy
-* No re-crawling of visited web pages
+For crawling strategy itself, we came up with a two tier approach for selecting which domains should be crawled.
+We define a list of whitelisted domains.
+Webpages on these domains will always be crawled.
+Furthermore, the crawler will follow all links on these webpages.
+Once the crawler arrives on webpage that is not in the whitelist, it still crawls that particular webpage, but does not follow any links on it.
+
+For creating the domain whitelist, we manually composed a list of domains most relevant to our usecase (HTML table extraction from webpages) based on three sources: Alexa Top 500 ranking [^alexa], Moz Top 500 [^moz] and CommonCrawl Top 1000 domains ranked by harmonic centrality [^cc-domains].
+Our selection focused on domains with high-quality, English language content.
+The full list of whitelisted domains is available in [Appendix B](#b.-list-of-whitelisted-domains).
+
+Additionally, we also created a domain blacklist.
+One example that demonstrates the necessity of this is the mobile pages of Wikipedia, which are available under a different domain (en.m.wikipedia.org instead of en.wikipedia.org), but still contain the same content.
+Similarly, we decided to exclude non-english wikipedias, since we wanted to focus on english content.
+The full list of blacklisted domains is available in [Appendix C](#c.-list-of-blacklisted-domains).
+
+Finally, we also gathered a list of seed URLs.
+These URLs are given to the spider when it starts crawling and serve as an entrypoint to the vast world wide web.
+From there on the spider will automatically crawl linked pages, as described before.
+Therefore, the topic of the initial seed URLs will influence the direction of the entire crawl.
+The chosen list of seed URLs is shown in [Appendix D](#d.-list-of-seed-urls).
+
+[^crawl-once]: [https://github.com/TeamHG-Memex/scrapy-crawl-once](https://github.com/TeamHG-Memex/scrapy-crawl-once)
+[^alexa]: [https://www.alexa.com/topsites](https://www.alexa.com/topsites)
+[^moz]: [https://moz.com/top500](https://moz.com/top500)
+[^cc-domains]: [https://commoncrawl.org/2020/10/host-and-domain-level-web-graphs-julaugsep-2020/](https://commoncrawl.org/2020/10/host-and-domain-level-web-graphs-julaugsep-2020/)
 
 ## Visualization
 
@@ -297,14 +324,18 @@ However, this would first require a data format compatibility study.
 Once these level of system performance has been captured, the table filtering and extraction algorithms implemented so far can be improved upon.
 In particular, the works from Ritze et al. [7] as well as Eberius et al. [11] should serve as an excellent starting point for these optimizations.
 
-Finally, the crawling strategy used for downloading pages from the world wide web should be tweaked. While a basic mechanism to avoid crawling the same URL multiple times has been implemented, websites have become very complex today and often host the same content on multiple distinct URLs. The knowledge that has been gained through search engine (and search engine optimization) in the last 15 years should be drawn upon.
-
+Furthermore, the crawling strategy used for downloading pages from the world wide web should be tweaked. While a basic mechanism to avoid crawling the same URL multiple times has been implemented, websites have become very complex today and often host the same content on multiple distinct URLs. The knowledge that has been gained through search engine (and search engine optimization) in the last 15 years should be drawn upon.
 
 At the same time, another interesting avenue for research is purposely re-visiting pages that have been crawled before, to check for updates made to those pages.
 
+Finally, in 2021 we are beginning to see a necessity for more advanced extraction techniques that support client-side rendering of webpages.
+At the moment, most websites containing tabular data are still rendered server-side (meaning the webserver generates the HTML and sends finished result to the client).
+However, there is an increasing number of websites, like [Our World In Data](https://ourworldindata.org/), that use client-side rendering and single page application frameworks (SPA), where the HTML content is generated on the client with JavaScript.
+In such cases, a headless browser environment is required which dramatically increases the compute resource requirements of the crawler.
+
 \clearpage
 
-# References
+# References {.unnumbered}
 
 [1] Hassan, Md Imrul, Hai L. Vu, and Taka Sakurai. *"Performance analysis of the IEEE 802.11 MAC protocol for DSRC safety applications."* IEEE Transactions on vehicular technology 60.8 (2011): 3882-3896.
 
@@ -330,8 +361,64 @@ At the same time, another interesting avenue for research is purposely re-visiti
 
 [12] https://www.arangodb.com/resources/white-paper/multi-model-database/
 
-# Appendices
+\clearpage
 
-## JSON schema definition
+# Appendices {.unnumbered}
+
+## A. JSON schema definition {.unnumbered}
 
 \lstinputlisting[basicstyle=\scriptsize\ttfamily]{../data/schema.json}
+
+## B. List of whitelisted domains {.unnumbered}
+
+The domain itself as well as all subdomains are whitelisted.
+
+```
+android.com
+apache.org
+bbc.co.uk
+blogspot.com
+creativecommons.org
+doi.org
+en.wikipedia.org
+europe.eu
+gamepedia.com
+github.com
+github.io
+iana.org
+imdb.com
+medium.com
+merriam-webster.com
+microsoft.com
+mozilla.org
+nasa.gov
+nih.gov
+noaa.gov
+schema.org
+statista.com
+w.org
+wikibooks.org
+wikimedia.org
+wikiquote.org
+wordpress.com
+wordpress.org
+```
+
+## C. List of blacklisted domains {.unnumbered}
+
+Python Regular Expressions
+
+```python
+[
+    # blacklist everything except en.wikipedia.org:
+    r'^(?!.*(en)).*\.wikipedia\.org',
+    # blacklist everything except english wikis:
+    r'^(?!.*(en)).*\.wiki.*\.org',
+    # blacklist mobile pages:
+    r'^.*\.m\..*',
+]
+```
+
+## D. List of Seed URLs {.unnumbered}
+
+\lstinputlisting{../data/seed-urls.txt}

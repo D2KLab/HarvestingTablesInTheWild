@@ -21,6 +21,7 @@ class CrawlingStrategy:
         r'^(.*\.|)creativecommons\.org',
         r'^(.*\.|)doi\.org',
         r'^(.*\.|)europe\.eu',
+        r'^(.*\.|)gamepedia\.com',
         r'^(.*\.|)github\.com',
         r'^(.*\.|)github\.io',
         r'^(.*\.|)iana\.org',
@@ -30,6 +31,7 @@ class CrawlingStrategy:
         r'^(.*\.|)microsoft\.com',
         r'^(.*\.|)mozilla\.org',
         r'^(.*\.|)nasa\.gov',
+        r'^(.*\.|)nih\.gov',
         r'^(.*\.|)noaa\.gov',
         r'^(.*\.|)schema\.org',
         r'^(.*\.|)statista\.com',
@@ -37,8 +39,8 @@ class CrawlingStrategy:
         r'^(.*\.|)wikibooks\.org',
         r'^(.*\.|)wikimedia\.org',
         r'^(.*\.|)wikiquote\.org',
+        r'^(.*\.|)wordpress\.com',
         r'^(.*\.|)wordpress\.org',
-        r'^(.*\.|)yahoo\.com',
     ]]
 
     blacklist_regexes = [re.compile(i) for i in [
