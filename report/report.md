@@ -202,10 +202,11 @@ The public dataset is currently hosted on Amazon S3 [^amazon-s3] through Amazon'
 
 To perform crawling over common crawl, we created a second separate spider that can search, retrieve and process webpages and forward them into our larger ingestion pipeline.
 Common crawl saves data in Web ARChive (WARC) format. To fetch any webpage from common crawl, we first need to query url in the common crawl index server which returns the WARC url of the page in bucket.
-To perform this two step process, our common crawl spider used the cdx-toolkit [^cdx-toolkit] library into our common crawl spider. This allows us to not only search for the webpage in the index, but it also fetches and downloads the WARC response.
+To perform this search process, our common crawl spider uses the cdx-toolkit [^cdx-toolkit] library. This library not only performs query searching on the index, but it also has the support to fetch and handle the WARC files.
 
-Since, the common crawl is a two step process, the input urls provided to scrapy is intercepted in middleware's `process_request` method. The intercepted request is redirected to `CommonCrawlSearch` which searches the common crawl search index.
-This class also has methods to download and return the html from common crawl dataset. The returned html can then be parsed and ingested through the same web crawl pipeline. 
+Downloading archived webpage from the common crawl is a two step process. It involves first querying the index for the given input URL and then downloading and processing the WARC file. To handle this, the input urls provided to scrapy is intercepted in middleware's `process_request` method.
+The intercepted request is redirected to `CommonCrawlSearch` which searches the common crawl search index.
+Additionally, this class also has methods to download the WARC file and process it to return the extracted html. The returned html can then be parsed and ingested through the same web crawl pipeline. 
 
 [^amazon-s3]: https://aws.amazon.com/s3/
 [^common-crawl]: https://commoncrawl.org
