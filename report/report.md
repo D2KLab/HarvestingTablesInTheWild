@@ -149,8 +149,10 @@ At this stage, our tool would simply take a list of URLs, download and parse the
 
 The next big step was implementing advanced table extraction and parsing algorithms.
 In particular, we decided to use two different algorithms for parsing tables on Wikipedia pages and the rest of the web pages.
-This decision was made because Wikipedia pages follow a much stricter format than the average table on the web.
-**TODO** @eelisk *Expand on the Wikipedia algorithm*
+The decision between extractors is made on a domain basis.
+This allows mode granular control over the parsed tables, as domains tend to follow certain formats for the data they display.
+Specifically, we parsed the semi-structured `wikitable` structures using techniques introduced in a related research paper [13].
+This structure for the parsers enables expanding the implementation for auxiliary domains, for a finer-grained control of certain edge-cases.
 
 Based on the literature we studied previously, we identified and implemented several important criteria which allow us to collect tables with meaningful content:
 
@@ -360,6 +362,8 @@ In such cases, a headless browser environment is required which dramatically inc
 [11] J. Eberius, K. Braunschweig, M. Hentsch, M. Thiele, A. Ahmadov and W. Lehner, "Building the Dresden Web Table Corpus: A Classification Approach," 2015 IEEE/ACM 2nd International Symposium on Big Data Computing (BDC), Limassol, 2015, https://doi.org/10.1145/2791347.2791353
 
 [12] https://www.arangodb.com/resources/white-paper/multi-model-database/
+
+[13] MUÑOZ, Emir; HOGAN, Aidan; MILEO, Alessandra, 2014, "Using linked data to mine RDF from wikipedia's tables, http://aidanhogan.com/docs/wikitables_wsdm2014.pdf
 
 \clearpage
 
