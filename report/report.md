@@ -309,7 +309,10 @@ The search depth and maximum number of nodes displayed in the graph can be dynam
 
 ## Topic annotation
 
-(*TBD*) with Orange API.
+Once the tables are ingested by Kafka, we start a process of annotating the collected data.
+For this purpose, we introduce an integration with the Orange table annotation API.
+At the time of writing this report, the production deployment is not operational as the API is still in beta and contains some discrepancies.
+Full API integration will be left as future work.
 
 # Results
 
