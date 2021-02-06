@@ -1,7 +1,7 @@
 ---
 author: "Jack Henschel, Rohit Raj, Eelis Kostiainen"
 title: "Harvesting Tables In The Wild"
-date: 2021-02-05
+date: 2021-02-06
 lang: en-US
 papersize: a4
 documentclass: article
@@ -26,16 +26,16 @@ While plain text data (such as regular HTML websites) are still comprehendible b
 
 One such example is that of HTML tables. From a human perspective, they are intuitively easy to understand (just by looking at them), but for a machine they are difficult to assess because of their graphical nature: all the little visual details (such as delimiters and orientation) matter a lot.
 At the same time, the tables themselves usually just contain the data (e.g. statistics), while the surrounding text (headers, captions and description) gives this data meaning.
-For example, the information pair "TSLA, 2007-12-03, 1234" is useless if we do not know that we are dealing with stock prices.
+For example, the information tuple "TSLA, 2007-12-03, 1234" is useless if we do not know that we are dealing with stock prices.
 
 As we will outline in [Section 2](#related-work), there has already been significant academic work in the field of semantic table interpretation.
 To develop, compare and optimize these systems however, large datasets are required.
 Therefore, the goal of our semester project has been the design and development of a system that collects tables
-from HTML on pages on the web.
+from HTML pages on the web.
 In [Section 3](#system-requirements-and-design) we give an overview of our system and an explanation of the architectural design choices.
 In [Section 4](#implementation-and-milestones), we go into the details of development and showcase the milestones we have reached during the project.
 In [Section 5](#results), we summarize the achievements of our work and present the results of our final table collection.
-Finally, in [Section 5](#future-work) we provide additional suggestions on how the system should be improved and extended.
+Finally, in [Section 6](#future-work) we provide additional suggestions on how the system should be improved and extended.
 
 # Related work
 
@@ -48,8 +48,8 @@ More specifically, their research introduces a publicly available dataset [^macd
 
 [^macdonald]: [https://dataverse.library.ualberta.ca/dataset.xhtml?persistentId=doi:10.7939/DVN/SHL1SL](https://dataverse.library.ualberta.ca/dataset.xhtml?persistentId=doi:10.7939/DVN/SHL1SL)
 
-Table extraction is the first step of this whole process. This process of extraction includes filtration of useless tables, proper formatting and consistent storage of tables to create a corpus.
-This process includes the classification of tables into one or more semantic (such as subject header, table header) and/or syntactic (such as row and columns) features.
+The process of extracting tables from webpages includes filtration of irrelevant tables, proper formatting and consistent storage of tables to create a corpus.
+This includes the classification of tables into one or more semantic (such as subject header, table header) and/or syntactic (such as row and columns) features.
 The work by Balakrishnan et. al. [15] used a collection of simple rules and machine learning classifiers to extract tables with an overall accuracy of 96%.
 
 Table interpretation is the act of giving semantic meaning to raw table data.
@@ -57,21 +57,20 @@ Among many other steps, this includes determining the data types of columns, the
 
 Ritze et al. have developed an algorithm to match HTML tables to DBpedia [7].
 The "T2K Match" algorithm is an iterative matching method combining schema and instance matching for matching mostly small and narrow HTML tables against cross-domain knowledge bases.
-The source code for this matching system is publicly available [^t2k]
+The source code for this matching system is publicly available [^t2k].
 Associating the table cells to semantic entities in knowledge bases greatly helps machines to deal with the logic of tables.
 
 [^t2k]: [https://github.com/T2KFramework/T2K](https://github.com/T2KFramework/T2K)
 
-More recently, Chabot et al. have described a similar system named "DAGOBAH" [8].
-DAGOBAH semantically annotates tables with entities either from Wikidata or DBpedia.
-It does this by determining the column types as well as performing cell and column annotation and relationship identification.
+More recently, Chabot et al. have described a similar system named _DAGOBAH_ [8].
+It semantically annotates tables with entities either from Wikidata or DBpedia by determining the column types as well as performing cell and column annotation and relationship identification.
 The system delivered promising results in the "Tabular Data to Knowledge Graph Matching" challenge [8], therefore we will be using it to annotate the tables in our processing pipeline.
 Furthermore, we had access to an API of this system in private beta as part of the Orange API [^orangeAPI].
 
 Muñoz et al. tackled the problem of table annotation for `wikitable` class data on Wikipedia [13].
 In this research, the table extraction is performed using the _TARTAR_ methodology, which performs table identification, recognition, and parsing.
 After extraction, the algorithm attempts to semantically interpret the tables with a raw accuracy of 40%.
-Later, a machine learning model utilizing Bagging Decision Trees is used to achieve an accuracy of 81.5% for a portion of the tables.
+Later, a machine learning model (utilizing Bagging Decision Trees) is used to achieve an accuracy of 81.5% for a portion of the tables.
 
 [^orangeAPI]: [https://developer.orange.com/products/all-apis/](https://developer.orange.com/products/all-apis/)
 
@@ -80,22 +79,22 @@ Later, a machine learning model utilizing Bagging Decision Trees is used to achi
 <!-- What we were planning to do (initial goals), an overview of our system and explanation of the design choices. -->
 
 This section gives a high-level overview of the table collection pipeline we have designed and built.
-Specific implementation details will be outlined in Section 3.
+Specific implementation details will be outlined in [Section 4](#implementation-and-milestones).
 
-![System architecture](images/archi.png){ width=70% }
+![System architecture](images/archi.png){ width=75% }
 
-Our pipeline consists of three main components: Scrapy Spiders (CommonCrawl and Web Spider) for downloading web pages, Kafka message queue for buffering extracted tables and ArangoDB database for storing them.
+Our pipeline consists of three main components: Scrapy Spiders (CommonCrawl and Web Spider) for downloading web pages from various sources and extracting tables, Kafka message queue for buffering extracted tables as well as ArangoDB database for storing them.
 To integrate these individual components, we have developed services to integrate them: an ingestion service for taking items from the message queue, performing annotations and inserting them into the database; and a post-processing service for performing processing on the entire dataset (e.g. creating a graph structure).
 
 We opted for the Python programming language for our implementation because it is very well suited for the task of crawling web pages.
 Its flexibility and loose typing make it very convenient to deal with arbitrary and unformatted data.
 Finally, it has many excellent open source libraries available.
 
-For the crawling itself, we decided to use the open-source Scrapy application framework [^scrapy]. It not only crawls the webpages using the spiders, but also has built-in support for web-page parsing with parsel [^parsel].
-This is in contrast with the libraries such as BeautifulSoup [^beautiful-soup] that only support parsing.
+For the crawling itself, we decided to use the open-source Scrapy application framework [^scrapy]. Not only does it *crawl* webpages (download and traverse) using so called *spiders*, but it also has built-in support for webpage parsing with the parsel library [^parsel].
+This is in contrast with other libraries such as BeautifulSoup [^beautiful-soup] that only support parsing.
 
-Scrapy provides a well thought-out scaffolding and project structure for each of its main components: spiders (modules for crawling web pages), middlewares (modules for modifying and discarding requests) and items (the pipeline result).
-Since all of them are combined into a pipeline by Scrapy's "engine", they are running in parallel and independent from each other.
+As Figure 2 shows, Scrapy provides a well thought-out scaffolding and project structure for each of its main components: spiders (modules for crawling web pages), middlewares (modules for modifying and discarding requests) and items (the pipeline result).
+Since all of them are combined into a pipeline by Scrapy's _engine_, they are running in parallel and independent from each other.
 Furthermore, for each of these components either project-level (download speed, parallel connections etc.) or individual settings (e.g. log verbosity) can be applied.
 
 ![Scrapy Architecture, *Image from Scrapy Documentation*](images/scrapy_architecture_02.png){ width=80% }
@@ -108,11 +107,11 @@ Messages queues are extensively used for asynchronous communication. A message q
 Moreover, as the ingestion service (consumer) is not interacting directly with the crawler (producer), it does not become a bottleneck and allows the ingestion service to process items out of the message queue at any speed.
 This gives the ingestion service more headroom to perform time consuming tasks, such as augmenting the tables with data obtained from external APIs.
 
-Our preferred choice of message queue was Kafka [^kafka] as it is one of the most popular message queue systems and is extensively used for distributed _event_ streaming services.
+Our preferred choice of message queue was Kafka [^kafka] as it is one of the most popular message queue systems and is extensively used for distributed event streaming services.
 Kafka follows a log-committed approach for message bus and hence can also be used as a temporary store of messages for a desirable unit of time.
 This is unlike other message queues, such as RabbitMQ [^rabbit-mq], which cannot store any message in case of a database failure.
 
-Since we were using containerized Kafka images, it was also easy to control the topics: their replications and partitions using the environment variables instead of using an admin API.
+Since we were using containerized Kafka images, it was also easy to control the topics: their replications and partitions were specified using environment variables instead of having to resort to an admin interface.
 
 [^kafka]: https://kafka.apache.org/
 [^rabbit-mq]: https://www.rabbitmq.com/
@@ -149,7 +148,7 @@ This section will cover our implementation and the milestones we have completed 
 The first significant milestone we reached was the basic crawling of web pages (i.e. downloading the HTML contents) and extracting the HTML tables.
 At this stage, our tool would simply take a list of URLs, download and parse these pages and finally store the results in a JSON file.
 Parsing is performed using the Scrapy framework, which includes a variety of methods that enable element selection from the crawled documents.
-To extract values from the table elements, we needed to extract the relevant content from within the cells.
+To extract values from the table elements, we needed to extract the relevant content without any formatting from within the cells.
 For this task, we used the Beautiful Soup python library.
 
 <!-- DONE: What library, if any, did you use to actually perform the table extraction (or was it coded from scratch)? Does Scrapy only manage the crawling part?  -->
@@ -158,15 +157,15 @@ For this task, we used the Beautiful Soup python library.
 
 The next big step was implementing advanced table extraction and parsing algorithms.
 In particular, we decided to use two different algorithms for parsing tables on Wikipedia pages and the rest of the web pages.
-The decision between extractors is made on a domain basis.
-This allows mode granular control over the parsed tables, as domains tend to follow certain formats for the data they display.
+The decision between extractors is made on a per-domain basis.
+This allows more granular control over the parsed tables, as domains tend to follow certain formats for the data they display.
 Specifically, we parsed the semi-structured `wikitable` structures using techniques introduced in a related research paper [13].
 This structure for the parsers enables expanding the implementation for auxiliary domains, for a finer-grained control of certain edge-cases.
 
 Based on the literature we studied previously, we identified and implemented several important criteria which allow us to collect tables with meaningful content:
 
 * ignore layout tables (table used for designing the webpage)
-* ignore tables irregular bodies (number of rows and columns varies)
+* ignore tables with irregular bodies (number of rows and columns varies)
 * ignore small tables (table with less than two rows)
 
 As mentioned in the introduction, the value of information inside a table is not only embedded in the table itself, but also in the context.
@@ -190,7 +189,7 @@ By now, we were collecting many different pieces of information and had to come 
 We evaluated several data formats that have already been used in other projects.
 Initially, we also considered using a storage format suitable for very large datasets, in particular Apache Avro, but decided against it due to the difficulty of dealing with binary formats.
 Furthermore, since we were planning to build a pipeline for table collection, an easily serializable plaintext format seemed more suitable for our purposes.
-Despite these requirements, we still had several contenders:
+With these requirements, we had several contenders:
 
 * TableNet (JSON based) [3]
 * DWTC Dresden Web Table Corpus (JSON based) [4]
@@ -204,23 +203,23 @@ Since the WTC format is based on the DWTC format, the DWTC seemed to be a widely
 We also considered the attributes it contained relevant to our use case, but at the same time decided to extend it with additional metadata and also incorporate some fields from the TableNet format.
 We hope that this common choice will enable others to easily reuse parts of our pipeline or the data.
 
-To document our final data format and make sure our application adheres to it, we created a JSON schema definition ([Appendix A](#a.-json-schema-definition)).
+To document our final data format and make sure our application adheres to it, we created a JSON schema definition ([Appendix A](#a.-json-schema-definition)) and also validated the output of our pipeline against it.
 
 ## Common Crawl
 
-In addition to crawling pages from the world wide web, we also wanted to explore using the Common Crawl dataset [1]. Common Crawl is a free corpus of web pages that had been consolidated over 12 years of continuous web crawling.
+In addition to crawling pages from the world wide web, we also wanted to explore using the Common Crawl dataset [1]. Common Crawl is a free corpus of web pages that has been consolidated over 12 years of continuous web crawling.
 The public dataset is currently hosted on Amazon S3 [^amazon-s3] through Amazon's public dataset program. This dataset gets updated once every month with raw web pages along with processed metadata and extracted text.
 
 To perform crawling over Common Crawl, we created a second separate spider that can search, retrieve and process webpages and forward them into our larger ingestion pipeline.
-Common Crawl saves data in Web ARChive (WARC) format. To fetch any webpage from the common crawl, we first need to query the URL in the Common Crawl index server which returns the WARC URL of the page in an S3 bucket.
-To perform this search process, our common crawl spider uses the cdx-toolkit [^cdx-toolkit] library. This library not only performs query searching on the index, but it also has the support to fetch and handle the WARC files.
+Common Crawl saves data in Web ARChive (WARC) format. To fetch any webpage from the Common Crawl, we first need to query the URL in the Common Crawl index server which returns the WARC URL of the page in an S3 bucket.
+
+To perform this search process, our CommonCrawl spider uses the cdx-toolkit [^cdx-toolkit] library. This library not only performs query searching on the index, but it also supports fetching and handling WARC files.
 
 Downloading any archived webpage from the Common Crawl is a two step process. It involves first querying the index for the given input URL and then downloading and processing the WARC file. To handle this, the input URL provided to Scrapy is intercepted in middleware's `process_request` method.
 The intercepted request is redirected to `CommonCrawlSearch` which searches the Common Crawl search index for a recent snapshot of the webpage.
 Additionally, this class also has methods to download the WARC file and process it to return the extracted HTML. The returned HTML can then be parsed and ingested through the same web crawl pipeline.
 
 [^amazon-s3]: https://aws.amazon.com/s3/
-[^common-crawl]: https://commoncrawl.org
 [^cdx-toolkit]: https://github.com/cocrawler/cdx_toolkit
 
 ## First crawl
@@ -257,7 +256,7 @@ After analyzing the results from our first crawl, we had to define a sensible cr
 After the spider downloads a webpage, it extracts all hyperlinks (inside HTML `<a>` tags) from it and generates new requests for these links.
 
 Firstly, we enabled a Scrapy plugin that prevents crawling previously visited pages [^crawl-once].
-Such a feature is necessary because it is common for links in the header and footer of webpages to be same across an entire domain (e.g. Privacy Policy and About pages)
+Such a feature is necessary because it is common for links in the header and footer of webpages to point to the same resource across an entire domain (e.g. Privacy Policy and About pages).
 This plugin keeps a sqlite database with all URLs that have been downloaded by the spider.
 
 For the crawling strategy itself, we came up with a two tier approach for selecting which domains should be crawled.
@@ -294,7 +293,7 @@ With these first results, we started exploring the graph capabilities of the Ara
 Until now we used the database only as a simple document store.
 
 In ArangoDB, documents stored in a regular *collection* ("database table") act as *vertices* ("nodes").
-In order to leverage the graph capabilities, we need to insert additional documents into *edge collection*.
+In order to leverage the graph capabilities, we need to insert additional documents into an *edge collection*.
 An edge document has at least two keys: `_from` and `_to`, which describe a directed edge from one vertex to another.
 The value of these keys are the IDs of the vertex documents.
 
@@ -316,12 +315,12 @@ Additionally, in this example we used a `type` key to distinguish different type
 In a post-processing step we establish the edges between all the relevant documents (tables and pages) we have previously collected.
 Then, we can explore this graph programmatically with the Arango Query Language (AQL) or visually through the Arango Dashboard.
 
-![Simple Graph in Arango Dashboard](images/simple-graph.png)
-
-In Figure 4, the violet circles represent page vertices (a webpage that has been accessed), while the black vertices represent table vertices (a table that has been extracted).
+In Figure 4, the violet circles represent page vertices (a webpage that has been accessed), while the black circles represent table vertices (a table that has been extracted).
 The virtual start node is "HTW Start" (where the crawl started), but the start node can be adjusted through the UI to start traversing the graph.
 Alongside the edges the edge type is displayed, in this example either "hyperlink" (one webpage links to another webpage) or "page-contains" (a table is embedded on a webpage).
-The search depth and the maximum number of nodes displayed in the graph can be dynamically adjusted in the UI to facilitate the exploration, though loading large graphs at all once breaks the visualization and has performance issues.
+The search depth and the maximum number of nodes displayed in the graph can be dynamically adjusted in the UI to facilitate the exploration, though loading large graphs all at once makes the visualization unclear and has performance issues.
+
+![Simple Graph in Arango Dashboard](images/simple-graph.png)
 
 ## Table processing & Topic annotation
 
@@ -343,7 +342,7 @@ Thus, the full API integration will be left as future work.
 We managed to build a web scraping and table processing pipeline from the ground up, utilizing basic components such as the Scrapy framework, Kafka message queue and ArangoDB document store.
 This pipeline can ingest data not only from the world wide web directly, but also through the Common Crawl index.
 We implemented advanced table parsing and specified a JSON data format for storing the tables, taking into account work that has previously been done in the field.
-While implementing our pipeline, we tried to keep the system modular and extensible, so that it can readily be reused by others.
+While implementing our pipeline, we tried to keep the system modular and extensible, so that it can readily be reused by others, by adhering to modern software development practices.
 
 ![Graph of visited pages during final collection](images/final-graph.png)
 
@@ -359,11 +358,11 @@ This is due to the constrained set of domains in our whitelist ([Appendix B](#b.
 
 <!-- How the work we have done so far can be continued or improved. -->
 
-For future work, the first would be measuring the current performance of the system.
+For future work, the first task would be measuring the current extraction performance of the system.
 For this task, a dataset, such as the one released by Macdonald and Barbosa, could be used to measure the extraction and detection accuracy of the system.
 However, this would first require a data format compatibility study.
 
-Once these level of system performance has been captured, the table filtering and extraction algorithms implemented so far can be improved upon.
+Once the level of system performance has been captured, the table filtering and extraction algorithms implemented so far can be improved upon.
 In particular, the works from Ritze et al. [7] as well as Eberius et al. [11] should serve as an excellent starting point for these optimizations.
 
 The pipeline allows a granular control of table extraction, but for the extracted data to be useful it should go through an annotation procedure, where the simple raw data is transformed into a meaningful format.
@@ -372,14 +371,16 @@ Specifically, using the Dagobah API from Orange could provide useful data once t
 
 <!-- DONE: When you go over a page that has been previously crawled, do you have mechanism to detect changes on the page or not?  -->
 
-Furthermore, the crawling strategy used for downloading pages from the world wide web should be tweaked. While a basic mechanism to avoid crawling the same URL multiple times has been implemented, websites have become very complex today and often host the same content on multiple distinct URLs. The knowledge that has been gained through the search engines (and search engine optimization) in the last 15 years should be drawn upon to explore the web of pages on the internet.
+Furthermore, the crawling strategy used for downloading pages from the world wide web should be tweaked. While a basic mechanism to avoid crawling the same URL multiple times has been implemented, websites have become very complex today and often host the same content on multiple distinct URLs. The knowledge that has been gained through search engines (and search engine optimization) in the last 15 years should be drawn upon to explore the web of pages on the internet.
 
 At the same time, another interesting avenue for research is purposely re-visiting pages that have been crawled before, to check for updates made to those pages.
 
 Finally, in 2021 we are beginning to see a necessity for more advanced extraction techniques that support client-side rendering of webpages.
 At the moment, most websites containing tabular data are still rendered server-side (meaning the webserver generates the HTML and sends the finished result to the client).
-However, there is an increasing number of websites, like [Our World In Data](https://ourworldindata.org/), that use client-side rendering and single page application frameworks (SPA), where the HTML content is generated on the client with JavaScript.
+However, there is an increasing number of websites, like _Our World In Data_[^worlddata], that use client-side rendering and single page application frameworks (SPA), where the HTML content is generated on the client with JavaScript.
 In such cases, a headless browser environment is required which dramatically increases the compute resource requirements of the crawler.
+
+[^worlddata]: [https://ourworldindata.org/](https://ourworldindata.org/)
 
 \clearpage
 
