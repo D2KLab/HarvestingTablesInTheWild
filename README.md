@@ -1,5 +1,9 @@
 # HarvestingTablesInTheWild
 
+To get a brief overview of the project, please refer to the [project presentation (PDF)](./report/final-presentation.pdf).
+
+For all details, check out the [full report (PDF)](./report/report.pdf).
+
 ## Requirements
 
 - Python 3.8
