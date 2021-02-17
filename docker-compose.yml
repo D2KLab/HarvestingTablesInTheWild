@@ -103,7 +103,7 @@ services:
       ARANGO_CREDENTIALS: '{"username":"root","password":"${ARANGO_ROOT_PASSWORD}"}'
       ORANGE_CLIENT_ID: "${ORANGE_CLIENT_ID}"
       ORANGE_CLIENT_SECRET: "${ORANGE_CLIENT_SECRET}"
-    command: ["python", 'postprocessing/postprocess.py']
+    command: ['python', '-m', 'postprocessing.postprocess']
 
 volumes:
   arangodb_data:
